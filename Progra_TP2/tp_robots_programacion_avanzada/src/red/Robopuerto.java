@@ -1,15 +1,13 @@
 package red;
 
-import java.util.*;
+//import java.util.*;
 import grafos.*;
 
-public class Robopuerto {
+public class Robopuerto implements Red.ComponenteRed{
 	private String id;
 	private final Coordenada coordenada;
 	private final Nodo nodo;
 	private final double radio = 10;
-
-	List<Cofre> cofres_en_radio = new LinkedList<Cofre>();
 
 	public Robopuerto(int x, int y, String id) {
 		this.id = id;
@@ -29,23 +27,12 @@ public class Robopuerto {
 		return radio;
 	}
 
-	public void agregar_cofreAccesible(Cofre cofre) {
-		this.cofres_en_radio.add(cofre);
-	}
-
 	public String getId() {
 		return id;
 	}
 
-	public List<Cofre> getCofres_en_radio() {
-		return cofres_en_radio;
-	}
-
 	@Override
 	public String toString() {
-		return "Robopuerto [id=" + id + ", coordenada=" + coordenada + ", nodo=" + nodo + ", radio=" + radio + "]\n";
+		return "Robopuerto [id=" + id + ", coordenada=" + coordenada + ", nodo=" + nodo + ", radio=" + radio + "]";
 	}
-	
-	
-
 }

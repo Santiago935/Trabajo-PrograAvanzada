@@ -48,6 +48,12 @@ public class Red {
 				+ ", robots=" + robots + "]";
 	}
 	
+	public interface ComponenteRed {
+	    Nodo getNodo();
+	    Coordenada getCoordenada();
+	}
 	
 
+	
+//fin
 }

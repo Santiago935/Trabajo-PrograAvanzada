@@ -22,8 +22,8 @@ public class Nodo {
     @Override
     public String toString() {
         if (alias == null) {
-            return "Nodo(" + id + ")";
+            return "Nodo[" + id + "]";
         }
-        return "Nod(" + id + ": " + alias + ")";
+        return "Nodo[" + id + ": " + alias + "]";
     }
 }

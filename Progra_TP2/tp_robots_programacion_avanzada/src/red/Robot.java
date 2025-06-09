@@ -52,4 +52,11 @@ public class Robot {
 		return bateria;
 	}
 
+	@Override
+	public String toString() {
+		return "Robot [id=" + id + ", carga_actual=" + carga_actual + "]";
+	}
+	
+	
+
 }

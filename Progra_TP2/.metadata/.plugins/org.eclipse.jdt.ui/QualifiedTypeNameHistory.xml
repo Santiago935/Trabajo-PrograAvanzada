@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
     <fullyQualifiedTypeName name="java.lang.RuntimeException"/>
+    <fullyQualifiedTypeName name="red.Red.ComponenteRed"/>
+    <fullyQualifiedTypeName name="red.Armado_Red"/>
 </qualifiedTypeNameHistroy>

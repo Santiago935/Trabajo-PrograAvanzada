@@ -2,7 +2,7 @@ package red;
 
 import grafos.*;
 
-public class Cofre {
+public class Cofre implements Red.ComponenteRed{
 	private String id;
 	private final Coordenada coordenada;
 	private final Nodo nodo;
@@ -45,4 +45,11 @@ public class Cofre {
 		return id;
 	}
 
+	@Override
+	public String toString() {
+		return "Cofre [id=" + id + ", coordenada=" + coordenada + ", nodo=" + nodo + "]";
+	}
+
+	
+	
 }
