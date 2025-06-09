@@ -1,0 +1,53 @@
+package red;
+
+import grafos.Nodo;
+import resolucion.Resolucion.Coordenada;
+import resolucion.Resolucion.Robopuerto;
+
+public class Cofre
+{
+	private String id;
+	private final Coordenada coordenada;
+	private final Nodo nodo;  
+	
+	private Robopuerto rp_mas_cercano;
+	private double distancia_rp;
+	
+	public Cofre(int x, int y, String id)
+	{
+		this.id=id;
+		this.coordenada = new Coordenada(x, y);
+		this.nodo = new Nodo(x+x*y, id); //Para tener id único
+	}
+
+	public Nodo getNodo() {
+		return nodo;
+	}
+
+	public Coordenada getCoordenada() {
+		return coordenada;
+	}
+
+	public Robopuerto getRp_mas_cercano() {
+		return rp_mas_cercano;
+	}
+
+	public void setRp_mas_cercano(Robopuerto rp_mas_cercano, double distancia) {
+		this.rp_mas_cercano = rp_mas_cercano;
+		setDistancia_rp(distancia);
+	}
+
+	public double getDistanciaRP_minima() {
+		return distancia_rp;
+	}
+
+	private void setDistancia_rp(double distancia_rp) {
+		this.distancia_rp = distancia_rp;
+	}
+
+	public String getId() {
+		return id;
+	}		
+	
+	
+}

@@ -1,0 +1,50 @@
+package red;
+
+import java.util.*;
+
+
+
+public class Robopuerto
+{
+	private String id;
+	private final Coordenada coordenada;
+	private final Nodo nodo;  
+	private final double radio=10;
+	
+	List<Cofre> cofres_en_radio = new LinkedList<Cofre>();
+	
+	public Robopuerto(int x, int y, String id)
+	{
+		this.id=id;
+		this.coordenada = new Coordenada(x, y);
+		this.nodo = new Nodo(x+x*y, id);//Para tener id único
+	}
+
+	public Nodo getNodo() {
+		return nodo;
+	}
+
+	public Coordenada getCoordenada() {
+		return coordenada;
+	}
+
+	public double getRadio() {
+		return radio;
+	}
+	
+	public void agregar_cofreAccesible(Cofre cofre)
+	{
+		this.cofres_en_radio.add(cofre);
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public List<Cofre> getCofres_en_radio() {
+		return cofres_en_radio;
+	}
+	
+	
+	
+}

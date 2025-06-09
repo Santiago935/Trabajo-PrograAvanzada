@@ -1,0 +1,48 @@
+package red;
+
+import grafos.*;
+import java.util.*;
+
+public class Red {
+	private Grafo grafo_red;
+	private List<Robopuerto> robopuertos = new ArrayList<Robopuerto>();
+	private List<Cofre> cofres = new ArrayList<Cofre>();
+	private List<Robot> robots = new ArrayList<Robot>();
+	
+	public Red()
+	{
+		this.grafo_red = new Grafo(false);
+	}
+
+	public Grafo getGrafo_red() {
+		return grafo_red;
+	}
+
+	public List<Robopuerto> getRobopuertos() {
+		return robopuertos;
+	}
+
+	public List<Cofre> getCofres() {
+		return cofres;
+	}
+
+	public List<Robot> getRobots() {
+		return robots;
+	}
+	
+	public void add_robot(Robot robot)
+	{
+		this.robots.add(robot);
+	}
+	
+	public void add_robopuerto(Robopuerto robopuerto)
+	{
+		this.robopuertos.add(robopuerto);
+	}
+	
+	public void add_cofre(Cofre cofre)
+	{
+		this.cofres.add(cofre);
+	}
+	
+}

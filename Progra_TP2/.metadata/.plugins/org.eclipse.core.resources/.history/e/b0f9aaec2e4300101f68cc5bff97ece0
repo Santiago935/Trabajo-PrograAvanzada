@@ -1,0 +1,15 @@
+package red;
+
+import grafos.*;
+import java.util.*;
+
+public class Red {
+	private Grafo grafo_red;
+	private List<Robopuerto> robopuertos = new ArrayList<Robopuerto>();
+	private List<Cofre> cofres = new ArrayList<Cofre>();
+	
+	public Red()
+	{
+		this.grafo_red = new Grafo(false);
+	}
+}
