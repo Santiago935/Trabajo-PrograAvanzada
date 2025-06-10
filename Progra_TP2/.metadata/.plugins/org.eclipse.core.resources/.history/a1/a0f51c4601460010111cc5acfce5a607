@@ -1,0 +1,150 @@
+package grafos;
+
+import java.util.*;
+import grafos.*;
+import cola_de_prioridad.*;
+
+public class AlgoritmosGrafos {
+	public static class Dijkstra_resultado {
+		private final Map<Integer, Double> costos_minimos;
+		private final Map<Integer, Integer> predecesores;
+
+		public Dijkstra_resultado(Map<Integer, Double> costos_minimos, Map<Integer, Integer> predecesores) {
+			this.costos_minimos = costos_minimos;
+			this.predecesores = predecesores;
+		}
+
+		public static void imprimirDijkstraResultado(Dijkstra_resultado resultado) {
+			System.out.println("Costos mínimos desde el nodo origen:");
+			for (Map.Entry<Integer, Double> entry : resultado.costos_minimos.entrySet()) {
+				System.out.println("Nodo " + entry.getKey() + ": " + entry.getValue());
+			}
+
+			System.out.println("\nPredecesores:");
+			for (Map.Entry<Integer, Integer> entry : resultado.predecesores.entrySet()) {
+				System.out.println("Nodo " + entry.getKey() + " <- " + entry.getValue());
+			}
+		}
+
+	}
+
+    public static Dijkstra_resultado dijkstraConBateria(
+            Grafo grafo,
+            Nodo inicio,
+            double bateriaInicial,
+            double bateriaMaxima,
+            Set<Integer> robopuertos) {
+
+        Map<Integer, Double> costosMinimos = new HashMap<>();
+        Map<Integer, Integer> predecesores = new HashMap<>();
+        Map<Integer, Double> mejorBateriaConCostoMinimo = new HashMap<>(); // Batería al llegar con costosMinimos[nodo]
+
+        // Iniciamos la cola de prioridad
+        TDA.Cola_prioridad_heap<EstadoNodo> colaPrioridad = new TDA.Cola_prioridad_heap<>();        // O una PriorityQueue estándar de Java:
+
+
+        for (Nodo nodo : grafo.getNodos()) {
+            costosMinimos.put(nodo.getId(), Double.MAX_VALUE);
+            predecesores.put(nodo.getId(), null);
+            mejorBateriaConCostoMinimo.put(nodo.getId(), -1.0); // Indica que no se ha llegado o no hay batería
+        }
+
+        //Agrego el nodo inicial y le creo un estado que irá a la cola de prioridad
+        costosMinimos.put(inicio.getId(), 0.0);
+        mejorBateriaConCostoMinimo.put(inicio.getId(), bateriaInicial);
+        colaPrioridad.encolar(new EstadoNodo(inicio, 0.0, bateriaInicial));
+
+        while (!colaPrioridad.estaVacia()) {
+            EstadoNodo estadoActual = colaPrioridad.desencolar();
+            Nodo nodoActual = estadoActual.nodo;
+            int idActual = nodoActual.getId();
+            double costoActual = estadoActual.costoAcumulado;
+            double bateriaAlLlegarANodoActual = estadoActual.bateriaAlLlegar;
+
+            // Si encontramos un camino más caro que uno ya conocido, o
+            // uno igual de caro pero con menos batería al llegar, lo ignoramos.
+            if (costoActual > costosMinimos.get(idActual) ||
+                (costoActual == costosMinimos.get(idActual) && bateriaAlLlegarANodoActual < mejorBateriaConCostoMinimo.get(idActual))) {
+                continue;
+            } //Ojo al comparar Double
+
+            // Determinar la batería disponible para salir del nodo actual
+            double bateriaParaSalirDeActual = bateriaAlLlegarANodoActual;
+            if (robopuertos.contains(idActual)) {
+                bateriaParaSalirDeActual = bateriaMaxima;
+                // NOTA: Si recargar en un robopuerto tuviera un costo (ej. de tiempo o energía),
+                // ese costo se añadiría a 'costoActual' ANTES de considerar los vecinos.
+                // Por simplicidad, aquí asumimos que la recarga es instantánea y gratuita en términos de "costo del camino".
+                // Ejemplo si recargar costara 1.0:
+                // costoActual += 1.0; // Esto complicaría la comparación anterior, se necesitaría un manejo más fino.
+            }
+
+            for (Arista arista : grafo.getAristas_deNodo(nodoActual)) {
+                Nodo vecino = arista.getObjetivo();
+                int idVecino = vecino.getId();
+                double pesoArista = arista.getPeso(); // Costo de la arista = batería consumida
+
+                if (bateriaParaSalirDeActual >= pesoArista) { // Suficiente batería para el viaje
+                    double bateriaAlLlegarAVecino = bateriaParaSalirDeActual - pesoArista;
+                    double nuevoCostoAVecino = costoActual + pesoArista;
+
+                    // Condición de relajación:
+                    // 1. ¿Encontramos un camino estrictamente más barato al vecino?
+                    // O 2. ¿Encontramos un camino con el mismo costo pero llegando con más batería?
+                    if (nuevoCostoAVecino < costosMinimos.get(idVecino) ||
+                        (nuevoCostoAVecino == costosMinimos.get(idVecino) && bateriaAlLlegarAVecino > mejorBateriaConCostoMinimo.get(idVecino))) {
+                        
+                        costosMinimos.put(idVecino, nuevoCostoAVecino);
+                        predecesores.put(idVecino, idActual);
+                        mejorBateriaConCostoMinimo.put(idVecino, bateriaAlLlegarAVecino);
+                        colaPrioridad.encolar(new EstadoNodo(vecino, nuevoCostoAVecino, bateriaAlLlegarAVecino));
+                    }
+                }
+            }
+        }
+        return new Dijkstra_resultado(costosMinimos, predecesores);
+    }
+}
+
+    // Clase auxiliar para la cola de prioridad
+	// CAMBIAR A PRIVATE Y HACERLE LOS GETS
+    private static class EstadoNodo implements Comparable<EstadoNodo> {
+        private final Nodo nodo;
+        private final double costoAcumulado;
+        private final double bateriaAlLlegar; // Batería con la que se LLEGA a este nodo por este camino
+
+        EstadoNodo(Nodo nodo, double costoAcumulado, double bateriaAlLlegar) {
+            this.nodo = nodo;
+            this.costoAcumulado = costoAcumulado;
+            this.bateriaAlLlegar = bateriaAlLlegar;
+        }
+        
+        public Nodo getNodo() {
+			return nodo;
+		}
+
+
+
+		public double getCostoAcumulado() {
+			return costoAcumulado;
+		}
+
+
+
+		public double getBateriaAlLlegar() {
+			return bateriaAlLlegar;
+		}
+
+
+
+		@Override
+        public int compareTo(EstadoNodo otro) {
+            // Prioriza menor costo.
+            // Si los costos son iguales, podrías desempatar por mayor batería,
+            // pero Dijkstra estándar no lo requiere; la lógica de relajación se encarga.
+            return Double.compare(this.costoAcumulado, otro.getCostoAcumulado());
+        }
+
+
+// Fin
+}

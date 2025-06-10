@@ -1,0 +1,118 @@
+package grafos;
+
+import java.util.*;
+import grafos.*;
+import cola_de_prioridad.*;
+
+public class AlgoritmosGrafos {
+	public static class Dijkstra_resultado {
+		private final Map<Integer, Double> costos_minimos;
+		private final Map<Integer, Integer> predecesores;
+
+		public Dijkstra_resultado(Map<Integer, Double> costos_minimos, Map<Integer, Integer> predecesores) {
+			this.costos_minimos = costos_minimos;
+			this.predecesores = predecesores;
+		}
+
+		public static void imprimirDijkstraResultado(Dijkstra_resultado resultado) {
+			System.out.println("Costos mínimos desde el nodo origen:");
+			for (Map.Entry<Integer, Double> entry : resultado.costos_minimos.entrySet()) {
+				System.out.println("Nodo " + entry.getKey() + ": " + entry.getValue());
+			}
+
+			System.out.println("\nPredecesores:");
+			for (Map.Entry<Integer, Integer> entry : resultado.predecesores.entrySet()) {
+				System.out.println("Nodo " + entry.getKey() + " <- " + entry.getValue());
+			}
+		}
+
+	}
+
+	public static Dijkstra_resultado dijkstra(Grafo grafo, Nodo inicio, int bateriaInicial, int bateriaMaxima,
+			Set<Integer> robopuertos) {
+		// Mapas para costos, visitados y padres
+		Map<Integer, Double> costos = new HashMap<Integer, Double>();
+		Map<Integer, Integer> padre = new HashMap<>();
+		Set<NodoCostoBateria> visitados = new HashSet<>();
+
+		// Cola de prioridad basada en el costo acumulado
+		TDA.Cola_prioridad_heap<NodoCostoBateria> cola = new TDA.Cola_prioridad_heap<>();
+
+		Set<Nodo> nodos = grafo.getNodos();
+
+		// Inicializacion
+		for (Nodo nodo : nodos) {
+			costos.put(nodo.getId(), Double.MAX_VALUE);
+			visitados.put(new NodoCostoBateria(nodo, Double.MAX_VALUE, Integer.MAX_VALUE));
+			padre.put(nodo.getId(), null);
+		}
+
+		// Agrego el nodo inicial
+		costos.put(inicio.getId(), 0.0); // Sobreescribo el infinito por 0
+		mejorBateriaAlLlegar.put(inicio.getId(), bateriaInicial);
+		cola.encolar(new NodoCostoBateria(inicio, 0.0, 0.0));
+
+		while (!cola.estaVacia()) {
+			// Extraemos el nodo con menor costo de ser alcanzado
+			NodoCostoBateria actual = cola.desencolar();
+			int actual_id = actual.nodo.getId();
+
+			if (!visitados.get(actual_id)) {
+				visitados.put(actual_id, true); // Si no estaba visitado, lo marco como visitado
+			}
+
+			// Me guardo la bateria actual
+			double bateriaActual = actual.bateriaRestante;
+			// Si es un robopuerto, la batería es la máxima (recarga)
+			if (robopuertos.contains(actual_id)) {
+				bateriaActual = bateriaMaxima; // Y deberia sumar 1 al costo
+			}
+
+			// Para cada vecino del actual (w), si no fue visitado antes (no pertenece a
+			// V-S)
+			// Recorro todos sus vecinos para ver si tengo forma de mejorar su distancia
+			for (Arista arista : grafo.getAristas_deNodo(actual.nodo)) {
+				Nodo vecino = arista.getObjetivo();
+				int vecino_id = vecino.getId();
+				Double peso_vecino = arista.getPeso();
+
+				// Si no estaba visitado, y si D[actual(w)] + C(w,vecino) es < D[vecino)
+				// Significa que la nueva distancia es mejor
+				// Y además, debe alcanzarme la batería
+				if (bateriaActual > peso_vecino) {
+					if (!visitados.get(vecino_id) && costos.get(vecino_id) > costos.get(actual_id) + peso_vecino) {
+						costos.put(vecino_id, costos.get(actual_id) + peso_vecino);
+						padre.put(vecino_id, actual_id); // Al vecino ahora llego desde el actual
+						Double bateria_nueva = bateriaActual - peso_vecino;
+						cola.encolar(new NodoCostoBateria(vecino, costos.get(vecino_id), bateria_nueva));
+					}
+				}
+
+			}
+		}
+		Dijkstra_resultado resultado = new Dijkstra_resultado(costos, padre);
+
+		return resultado;
+	}
+
+	// Clase auxiliar para manejar el nodo, la batería y el costo acumulado en la
+	// cola de prioridad
+	static class NodoCostoBateria implements Comparable<NodoCostoBateria> {
+		Nodo nodo;
+		int costo;
+		int bateriaRestante;
+
+		NodoCostoBateria(Nodo nodo, Double costo, int bateriaRestante) {
+            this.nodo = nodo;
+            this.costo = (int) Math.round(costo);
+            this.bateriaRestante = bateriaRestante;
+            
+       
+        public int compareTo(NodoCostoBateria otro) {
+            return Integer.compare(this.costo, otro.costo);
+        	}
+		}
+	}
+
+// Fin
+}
