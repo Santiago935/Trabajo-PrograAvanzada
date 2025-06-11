@@ -5,11 +5,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Ruta rodrigo
+//String nombreArchivo = "C:\\Users\\user\\Desktop\\Nuevo-Workspace\\tp_robots_programacion_avanzada\\src\\red\\archivoRobopuertos.csv";
+
 
 public class ImportarArchivos {
 
     public ArrayList<Robopuerto> leerArchivoRobopuertos() {
-        String nombreArchivo = "C:\\Universidad\\Programacion Avanzada\\Trabajo-PrograAvanzada-main\\Progra_TP2\\tp_robots_programacion_avanzada\\src\\red\\archivoRobopuertos.csv";
+        String nombreArchivo = "C:\\Users\\user\\Desktop\\Nuevo-Workspace\\tp_robots_programacion_avanzada\\src\\red\\archivoRobopuertos.csv";
         //Ver como mejorar la ruta del archivo
         ArrayList<Robopuerto> listaRoboPuertos = new ArrayList<>();
         BufferedReader lector = null;

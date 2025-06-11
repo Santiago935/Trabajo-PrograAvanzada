@@ -2,6 +2,7 @@ package red;
 
 import java.util.*;
 
+import cofres.Cofre;
 import grafos.Grafo;
 
 public class ArmadoRed {
@@ -61,6 +62,8 @@ public class ArmadoRed {
 							rb.getCoordenada()) < rb.getRadio()) {
 						red.add_cofre(cofre);
 						visitados.add(cofre);
+						//log para ver que cofres entran en al red
+						//System.out.println(">> Cofre " + cofre.getId() + " agregado a la red"); 
 					}
 				}
 			}
