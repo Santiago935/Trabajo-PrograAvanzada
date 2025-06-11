@@ -1,34 +1,28 @@
 package resolucion;
 
 import grafos.*;
-import red.*;
 import java.util.*;
+import red.*;
+
 
 public class Resolucion {
 
 	
 	public static void main(String[] args) {
-		// Red 1
-		Robopuerto rp1 = new Robopuerto(0, 0, "RP1");
-		Robopuerto rp2 = new Robopuerto(15, 0, "RP2"); 
-		Robopuerto rp3 = new Robopuerto(5, 8, "RP3");
-		
-		//Red 2
-		Robopuerto rp4 = new Robopuerto(40, 0, "RP4"); 
-		Robopuerto rp5 = new Robopuerto(55, 0, "RP5");
-		
-		Robopuerto rp6 = new Robopuerto(100, 100, "RP6"); //-> Alejado, red independiente
-		
-		
-		// Cofres
+
+		ImportarArchivos importador = new ImportarArchivos();
+		ArrayList<Robopuerto> robopuertos = importador.leerArchivoRobopuertos();
+		for(Robopuerto aux : robopuertos) {
+			System.out.println(aux);
+		}
+
+				// Cofres
 		Cofre c1 = new Cofre(5, 0, "C1"); // cerca de RP1
 		Cofre c2 = new Cofre(0, 7, "C2"); // cerca de RP1
 		Cofre c3 = new Cofre(20, 0, "C3"); // cerca de RP2
 		Cofre c4 = new Cofre(15, 7, "C4"); // cerca de RP2
 		Cofre c5 = new Cofre(8, 0, "C5"); // en medio, dentro de ambos (sin estar en límite)
 		Cofre c6 = new Cofre(50, 50, "C6"); // fuera de ambos
-
-		Robopuerto[] robopuertos = { rp1, rp2, rp3, rp4, rp5, rp6};
 		Cofre[] cofres = { c1, c2, c3, c4, c5, c6 };
 
 		// Paso 1: Armar las redes
@@ -41,26 +35,26 @@ public class Resolucion {
 		ArrayList<Grafo> grafos = ArmadoRed.generarGrafos(redes);
 
 		pruebaDijkstraModificado();
+
 		
 	}
 	
-	
 	public static void pruebas_red() {
 	    // Robopuertos con coordenadas fáciles
-	    Robopuerto rp1 = new Robopuerto(0, 0, "RP1");
-	    Robopuerto rp2 = new Robopuerto(3, 4, "RP2");
-	    Robopuerto rp3 = new Robopuerto(50, 0, "RP3");
-	    Robopuerto rp4 = new Robopuerto(53, 4, "RP4");
-	    
-	    
+	    Robopuerto rp1 = new Robopuerto("RP1", 0, 0, 10);
+	    Robopuerto rp2 = new Robopuerto("RP2", 3, 4, 10);
+	    Robopuerto rp3 = new Robopuerto("RP3", 50, 0, 20);
+	    Robopuerto rp4 = new Robopuerto("RP4", 53, 4, 20);
+
+
 	    // Cofres con coordenadas simples
 	    Cofre c1 = new Cofre(6, 0, "C1");
 	    Cofre c2 = new Cofre(0, 5, "C2");
 	    Cofre c3 = new Cofre(56, 0, "C3");
 	    Cofre c4 = new Cofre(50, 5, "C4");
-	    
-	    
-	    Robopuerto[] robopuertos = { rp1, rp2, rp3, rp4 };
+
+
+	    ArrayList<Robopuerto> robopuertos = new ArrayList<>(Arrays.asList(rp1, rp2, rp3, rp4));
 	    Cofre[] cofres = { c1, c2 , c3, c4};
 
 	    // Crear redes y agregar cofres
@@ -280,4 +274,5 @@ public class Resolucion {
 
 	
 //Fin
+}
 }
