@@ -9,7 +9,7 @@ public class ArmadoRed {
 	// Metodos para la configuración inicial de la red
 	// -------------------------------------------------------------------------------------------
 
-	public static ArrayList<Red> armado_redes(Robopuerto[] robopuertos, Cofre[] cofres) {
+	public static ArrayList<Red> armado_redes(ArrayList<Robopuerto> robopuertos, Cofre[] cofres) {
 		ArrayList<Red> lista_redes = new ArrayList<Red>();
 		int i = 1;
 
