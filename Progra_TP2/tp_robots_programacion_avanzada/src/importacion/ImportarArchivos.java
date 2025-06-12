@@ -1,8 +1,9 @@
 package importacion;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import red.Robopuerto;
 
@@ -10,12 +11,12 @@ import red.Robopuerto;
 public class ImportarArchivos {
 
     public ArrayList<Robopuerto> leerArchivoRobopuertos() {
-        String nombreArchivo = "C:\\Universidad\\Programacion Avanzada\\Trabajo-PrograAvanzada-main\\Progra_TP2\\tp_robots_programacion_avanzada\\src\\importacion\\archivoRobopuertos.csv";
+        InputStream nombreArchivo = getClass().getResourceAsStream("/importacion/archivoRoboPuertos.csv");
         //Ver como mejorar la ruta del archivo
         ArrayList<Robopuerto> listaRoboPuertos = new ArrayList<>();
         BufferedReader lector = null;
         try {
-            lector = new BufferedReader(new FileReader(nombreArchivo));
+            lector = new BufferedReader(new InputStreamReader(nombreArchivo));
             String linea;
             while ((linea = lector.readLine()) != null) {
                 String[] valores = linea.split(";"); // Divide la línea por punto y coma
