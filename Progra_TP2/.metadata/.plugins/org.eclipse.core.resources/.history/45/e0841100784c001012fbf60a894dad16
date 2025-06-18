@@ -1,0 +1,41 @@
+package cofres;
+
+import utiles.Item;
+
+public class CofreProvisionActiva extends Cofre {
+
+    public CofreProvisionActiva(int x, int y, String id) {
+        super(x, y, id);
+    }
+
+    public void guardarItem(Item item, int cantidad) {
+        items.put(item, items.getOrDefault(item, 0) + cantidad);
+    }
+
+    public boolean sacarItem(Item item, int cantidad) {
+        int disponible = items.getOrDefault(item, 0);
+        if (disponible < cantidad) return false;
+
+        if (disponible == cantidad)
+            items.remove(item);
+        else
+            items.put(item, disponible - cantidad);
+
+        return true;
+    }
+
+    public int consultarStock(Item item) {
+        return items.getOrDefault(item, 0);
+    }
+
+    //Pisamos el toString super y hacemos el especifico
+	@Override
+	public String toString() {
+		return "Cofre [id=" + getId() + 
+				", coordenada=" + getCoordenada() + 
+				", nodo=" + getNodo() + 
+				", tipo= CofreProvisionActiva" + 
+				"]";
+	}
+
+}

@@ -1,0 +1,30 @@
+package cofres;
+
+import java.util.HashMap;
+
+import utiles.Item;
+
+public class CofreProvisionActiva extends Cofre {
+
+    public CofreProvisionActiva(int x, int y, String id) {
+        super(x, y, id);
+    }
+
+    public static HashMap<Item, Integer> ofertaDeItems()
+    {
+    	return this.items;
+    }
+    
+
+
+    //Pisamos el toString super y hacemos el especifico
+	@Override
+	public String toString() {
+		return "Cofre [id=" + getId() + 
+				", coordenada=" + getCoordenada() + 
+				", nodo=" + getNodo() + 
+				", tipo= CofreProvisionActiva" + 
+				"]";
+	}
+
+}

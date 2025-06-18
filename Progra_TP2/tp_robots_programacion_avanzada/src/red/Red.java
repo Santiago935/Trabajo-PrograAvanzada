@@ -3,6 +3,8 @@ package red;
 import grafos.*;
 import java.util.*;
 
+import cofres.Cofre;
+
 public class Red {
 	private String id;
 	private Grafo grafo_red = new Grafo(false);;

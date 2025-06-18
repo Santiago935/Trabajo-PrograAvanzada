@@ -2,6 +2,7 @@ package red;
 
 import java.util.*;
 
+import cofres.Cofre;
 import grafos.Grafo;
 
 public class ArmadoRed {
@@ -34,6 +35,8 @@ public class ArmadoRed {
 			}
 		}
 
+		armado_cofres(lista_redes, cofres);
+		
 		return lista_redes;
 	}
 

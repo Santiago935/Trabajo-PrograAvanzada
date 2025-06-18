@@ -2,56 +2,106 @@ package resolucion;
 
 import grafos.*;
 import java.util.*;
-import red.*;
 
+import cofres.*;
+import importacion.*;
+import red.*;
+import utiles.*;
 
 public class Resolucion {
 
 	
 	public static void main(String[] args) {
-
+		
 		ImportarArchivos importador = new ImportarArchivos();
 		ArrayList<Robopuerto> robopuertos = importador.leerArchivoRobopuertos();
-		for(Robopuerto aux : robopuertos) {
+
+		System.out.println("LOS ROBOPUERTOS SON:");
+		for (Robopuerto aux : robopuertos) {
 			System.out.println(aux);
 		}
+		System.out.println("--------------------");
 
-				// Cofres
-		Cofre c1 = new Cofre(5, 0, "C1"); // cerca de RP1
-		Cofre c2 = new Cofre(0, 7, "C2"); // cerca de RP1
-		Cofre c3 = new Cofre(20, 0, "C3"); // cerca de RP2
-		Cofre c4 = new Cofre(15, 7, "C4"); // cerca de RP2
-		Cofre c5 = new Cofre(8, 0, "C5"); // en medio, dentro de ambos (sin estar en límite)
-		Cofre c6 = new Cofre(50, 50, "C6"); // fuera de ambos
-		Cofre[] cofres = { c1, c2, c3, c4, c5, c6 };
+		// Cofres
+		CofreSolicitud c1 = new CofreSolicitud(2, 0, "C1"); // cerca de RP1
+		CofreSolicitud c2 = new CofreSolicitud(0, 7, "C2"); // cerca de RP1
+		CofreSolicitud c3 = new CofreSolicitud(20, 0, "C3"); // cerca de RP2
+		CofreSolicitud c4 = new CofreSolicitud(15, 7, "C4"); // cerca de RP2
+		CofreSolicitud c5 = new CofreSolicitud(8, 0, "C5"); // en medio, dentro de ambos (sin estar en límite)
+		CofreSolicitud c6 = new CofreSolicitud(50, 50, "C6"); // fuera de ambos
 
-		// Paso 1: Armar las redes
+		CofreProvisionActiva cpa1 = new CofreProvisionActiva(0, 1, "CPA1"); // cerca de RP 2
+		
+		Cofre[] cofres = { c1, c2, c3, c4, c5, c6, cpa1 };
+
+		System.out.println("LOS COFRES SON:");
+		for (int i = 0; i < cofres.length; i++) {
+			System.out.println(cofres[i]);
+		}
+		System.out.println("--------------------");
+		
 		ArrayList<Red> redes = ArmadoRed.armado_redes(robopuertos, cofres);
+		
+		
+		
+		System.out.println("LAS REDES SON:");
+		for (Red red : redes) {
+			System.out.println(red);
+		}
+		System.out.println("--------------------");
 
-		// Paso 2: Asignar cofres a las redes
-		ArmadoRed.armado_cofres(redes, cofres);
+		// Paso 4: cargar items en el sistema	
+		Item i1 = new Item(1000, "Microchips", "Microchips de silicio para ensamblaje");
+		Item i2 = new Item(2000, "Baterias", "Baterias de alta capacidad de litio");
+		Item item[] = {i1, i2};
 
-		// Paso 3: Generar grafos para cada red
-		ArrayList<Grafo> grafos = ArmadoRed.generarGrafos(redes);
+		System.out.println("LAS ITEMS SON:");
+		for (Item i : item) {
+			System.out.println(i);
+		}
+		System.out.println("--------------------");
 
-		pruebaDijkstraModificado();
+		// Como c1 y cpa1 estan en la misma red les creo un pedido y un ofrecimiento del mismo item
+		// Paso 5: cargar las solicitudes de los cofres:
+		c1.solicitarItem(i1, 100); // este sera atendido por el cofre cpa1
+		c1.solicitarItem(i2, 100); // este no lo voy a atender
 
+		// Paso 6: cargar que cofres ofrecen los items:
+		cpa1.guardarItem(i1, 100); // stock suficiente para atender c1
+		cpa1.agregarOferta(i1, 100); //Oferto SI PUEDO
+
+		System.out.println("c1 pide item>>" + c1.consultarCantidadSolicitada(i1));
+		System.out.println("cp1 tiene item >>" + cpa1.tieneItem(i1));
+		System.out.println("cp1 tiene item>>" + cpa1.tieneItem(i2));
+
+		// Paso 7: armar los pedidos
+		//armamos los pedidos
+		
+		System.out.println("\nARMADO DE PEDIDOS:");
+		ArrayList<Pedido> listaDePedidos = Pedido.armado_pedidos2(redes);
+		for (Pedido pedido : listaDePedidos) {
+			System.out.println(pedido);
+		}
+
+		System.out.println("--------------------");
+		System.out.println(">>" + c1.consultarCantidadSolicitada(i1));
+		System.out.println(">>" + cpa1.tieneItem(i1));
+		System.out.println(">>" + cpa1.tieneItem(i2));
+
+		// Paso 8: atender los pedidos
+
+		// ArrayList<Grafo> grafos = ArmadoRed.generarGrafos(redes);
+		// pruebaDijkstraModificado();
+	
+		
 		
 	}
 	
-	public static void pruebas_red() {
-	    // Robopuertos con coordenadas fáciles
-	    Robopuerto rp1 = new Robopuerto("RP1", 0, 0, 10);
-	    Robopuerto rp2 = new Robopuerto("RP2", 3, 4, 10);
-	    Robopuerto rp3 = new Robopuerto("RP3", 50, 0, 20);
-	    Robopuerto rp4 = new Robopuerto("RP4", 53, 4, 20);
+	
+	
+	/*
 
 
-	    // Cofres con coordenadas simples
-	    Cofre c1 = new Cofre(6, 0, "C1");
-	    Cofre c2 = new Cofre(0, 5, "C2");
-	    Cofre c3 = new Cofre(56, 0, "C3");
-	    Cofre c4 = new Cofre(50, 5, "C4");
 
 
 	    ArrayList<Robopuerto> robopuertos = new ArrayList<>(Arrays.asList(rp1, rp2, rp3, rp4));
@@ -81,7 +131,7 @@ public class Resolucion {
 	        
 	    }
 	}
-
+*/
 
 	    public static void pruebaDijkstraModificado() {
 	        // --- Caso 1: Camino simple, batería suficiente ---
@@ -272,7 +322,37 @@ public class Resolucion {
 	         */
 	}
 
-	
+	/*
+	public static void prueba_importacion_1()
+	{
+		ImportarArchivos importador = new ImportarArchivos();
+		ArrayList<Robopuerto> robopuertos = importador.leerArchivoRobopuertos();
+		for(Robopuerto aux : robopuertos) {
+			System.out.println(aux);
+		}
+
+				// Cofres
+		Cofre c1 = new Cofre(5, 0, "C1"); // cerca de RP1
+		Cofre c2 = new Cofre(0, 7, "C2"); // cerca de RP1
+		Cofre c3 = new Cofre(20, 0, "C3"); // cerca de RP2
+		Cofre c4 = new Cofre(15, 7, "C4"); // cerca de RP2
+		Cofre c5 = new Cofre(8, 0, "C5"); // en medio, dentro de ambos (sin estar en límite)
+		Cofre c6 = new Cofre(50, 50, "C6"); // fuera de ambos
+		Cofre[] cofres = { c1, c2, c3, c4, c5, c6 };
+
+		// Paso 1: Armar las redes
+		ArrayList<Red> redes = ArmadoRed.armado_redes(robopuertos, cofres);
+
+		// Paso 2: Asignar cofres a las redes
+		ArmadoRed.armado_cofres(redes, cofres);
+
+		// Paso 3: Generar grafos para cada red
+		//ArrayList<Grafo> grafos = ArmadoRed.generarGrafos(redes);
+
+		//pruebaDijkstraModificado();
+	}
+	   */
+	    
 //Fin
 }
-}
+
