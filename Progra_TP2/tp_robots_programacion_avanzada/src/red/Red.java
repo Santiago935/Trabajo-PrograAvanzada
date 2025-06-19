@@ -15,6 +15,14 @@ public class Red {
 	public Red(String id) {
 		this.id = id;
 	}
+	
+	public Set<Integer> getIdsNodosRobopuertos() {
+	    Set<Integer> ids = new HashSet<>();
+	    for (Robopuerto rp : robopuertos) {
+	        ids.add(rp.getNodo().getId());
+	    }
+	    return ids;
+	}
 
 	public Grafo getGrafo_red() {
 		return grafo_red;

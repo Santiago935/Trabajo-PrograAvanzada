@@ -1,0 +1,48 @@
+package utiles;
+
+import grafos.*;
+import red.*;
+import cola_de_prioridad.TDA.Cola_prioridad_heap;
+
+
+public class Simulador {
+	private static Grafo grafo; // tu grafo con nodos y distancias
+	private static Cola_prioridad_heap<Pedido> pedidos;
+	private static ArrayList<Robot> disponibles;
+	private static ArrayList<Robot> ocupados;
+	
+	public static void simularTurno() {
+		// Asignar robots a pedidos
+		while (!pedidos.esVacia() && !disponibles.isEmpty()) {
+			Pedido pedido = pedidos.desencolar();
+
+			Robot mejorRobot = buscarRobotMasCercano(pedido.getNodoSolicitante());
+			if (mejorRobot != null) {
+				List<Nodo> camino = dijkstra(mejorRobot.getNodo_actual(), pedido.getNodoSolicitante());
+				mejorRobot.asignarViaje(camino, pedido, true);
+				disponibles.remove(mejorRobot);
+				ocupados.add(mejorRobot);
+			} else {
+				// No hay robots disponibles que puedan llegar
+				pedidos.encolar(pedido);
+				break;
+			}
+		}
+
+		// Avanzar los robots ocupados
+		List<Robot> terminados = new ArrayList<>();
+		for (Robot r : ocupados) {
+			r.avanzarUnTurno();
+			if (r.estaLibre()) {
+				terminados.add(r);
+			}
+		}
+
+		// Liberar los que terminaron
+		ocupados.removeAll(terminados);
+		disponibles.addAll(terminados);
+	}
+
+	
+	
+}

@@ -6,4 +6,7 @@
     <fullyQualifiedTypeName name="grafos.AlgoritmosGrafos.NodoCostoBateria"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="red.ArmadoRed"/>
+    <fullyQualifiedTypeName name="cola_de_prioridad.TDA.Cola_prioridad_heap"/>
+    <fullyQualifiedTypeName name="grafos.AlgoritmosGrafos"/>
+    <fullyQualifiedTypeName name="grafos.AlgoritmosGrafos.Dijkstra_resultado"/>
 </qualifiedTypeNameHistroy>

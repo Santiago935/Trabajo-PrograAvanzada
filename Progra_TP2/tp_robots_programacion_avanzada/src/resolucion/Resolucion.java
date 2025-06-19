@@ -1,17 +1,39 @@
 package resolucion;
 
 import cofres.*;
+<<<<<<< Updated upstream
 import grafos.*;
+=======
+import cola_de_prioridad.TDA.Cola_prioridad_heap;
+>>>>>>> Stashed changes
 import importacion.*;
 import java.util.*;
 import red.*;
 import utiles.*;
 
+
+
 public class Resolucion {
 
+	//------------------- Obtener pedidos ORDENADOS ----- //
 	
-	public static void main(String[] args) {
+	public static Cola_prioridad_heap<Pedido> obtenerPedidosOrdenados(ArrayList<Pedido> listaDesordenada)
+	{
+		//Uso heap de mínimo para priorizar pedidos mas cortos
+		Cola_prioridad_heap<Pedido> pedidos = new Cola_prioridad_heap<Pedido>();
 		
+		for (Pedido pedido : listaDesordenada) {
+			pedidos.encolar(pedido);
+		}
+		
+		return pedidos;
+	}
+	
+	//-------------------------------------------------//
+	
+	
+	
+	public static void main(String[] args) {	
 		ImportarArchivos importador = new ImportarArchivos();
 		ArrayList<Robopuerto> robopuertos = importador.leerArchivoRobopuertos();
 

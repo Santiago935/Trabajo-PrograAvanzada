@@ -5,37 +5,56 @@ import java.util.*;
 import cofres.*;
 import red.*;
 
-public class Pedido {
-	private Cofre cSolicito; //cambiar nombre
-	private Cofre cAtendio;
+public class Pedido implements Comparable<Pedido>{
+	private Cofre cOrigen; //cambiar nombre
+	private Cofre cDestino;
 	private Item item;
 	private int cantidad;
 	private double distancia; 
 
 	public Pedido(Cofre cSolicito, Cofre cAtendio, Item item, int cantidad) {
-		this.cSolicito = cSolicito;
-		this.cAtendio = cAtendio;
+		this.cOrigen = cSolicito;
+		this.cDestino = cAtendio;
 		this.item = item;
 		this.cantidad = cantidad;
 		// Agregar distancia
 	}
 
 	public void AtenderPedido(Cofre cofreQueAtendera) {
-		if(this.cAtendio != null) // si el pedido ya fue atendido
+		if(this.cDestino != null) // si el pedido ya fue atendido
 			return;
 
-		this.cAtendio = cofreQueAtendera;
+		this.cDestino = cofreQueAtendera;
 
 		//calculo de la distancia
-		this.distancia = Coordenada.distancia_eucladiana(this.cSolicito.getCoordenada() ,  this.cAtendio.getCoordenada());
+		this.distancia = Coordenada.distancia_eucladiana(this.cOrigen.getCoordenada() ,  this.cDestino.getCoordenada());
 	}
 
+	//LO TENGO QUE BORRAR
 	public Cofre getcSolicito() {
-		return cSolicito;
+		return cOrigen;
+	}
+	
+	
+	public Cofre getcOrigen() {
+		return cOrigen;
 	}
 
+	public void setcOrigen(Cofre cOrigen) {
+		this.cOrigen = cOrigen;
+	}
+
+	public Cofre getcDestino() {
+		return cDestino;
+	}
+
+	public void setcDestino(Cofre cDestino) {
+		this.cDestino = cDestino;
+	}
+
+	//LO TENGO QUE BORRAR
 	public Cofre getcAtendio() {
-		return cAtendio;
+		return cDestino;
 	}
 
 	public Item getItem() {
@@ -52,12 +71,16 @@ public class Pedido {
 
 	@Override
 	public String toString() {
-		return "Pedido [cSolicito=" + cSolicito + ", cAtendio=" + cAtendio + ", item=" + item + ", cantidad=" + cantidad
+		return "Pedido [cSolicito=" + cOrigen + ", cAtendio=" + cDestino + ", item=" + item + ", cantidad=" + cantidad
 				+ ", distancia=" + distancia + "]";
 	}
 
 
-
+	@Override
+	public int compareTo(Pedido otroPedido)
+	{
+		return Double.compare(this.distancia, otroPedido.distancia);
+	}
 
 	
 	public static ArrayList<Pedido> armado_pedidos2(ArrayList<Red> redes) {
@@ -129,91 +152,13 @@ public class Pedido {
 		return pedidos;
 	}
 
+
 	
-	/*
-	public static ArrayList<Pedido> armado_pedidos(ArrayList<Red> redes) {
-		ArrayList<Pedido> pedidos = new ArrayList<>();
-
-		// 1) llenamos los pedidos con solicitudes de cofres que solicitan
-		for (Red red : redes) {
-			// para cada cofre dentro de la red
-			for (Cofre c : red.getCofres()) {
-
-				if (c instanceof CofreSolicitud) { // si es un cofre de solicitud
-					CofreSolicitud cofreSolicitud = (CofreSolicitud) c;
-
-					// Iteramos por cada pedido: cada item y su cantidad
-					for (Item item : cofreSolicitud.getPedidos().keySet()) {
-						int cantidad = cofreSolicitud.consultarCantidadSolicitada(item);
-
-						// Creamos un nuevo Pedido con el cofre que solicita, el item y la cantidad
-						Pedido pedido = new Pedido(cofreSolicitud, item, cantidad);
-
-						// Lo agregamos a la lista de pedidos a procesar
-						pedidos.add(pedido);
-					}
-				}
-			}
-		}
-
-		// Este item se deberia cambiar por
-		// - consultar con cofres de provision activa
-		// - si no hay ninguno de provision activa, consultar con cofres buffer
-		// - si no hay ninguno de buffer, consultar con cofres pasivos
-		// 2) atendemos los pedidos con cofres de provisión activa de la misma red
-		for (Pedido pedido : pedidos) { // para cada pedido
-			CofreSolicitud cofreSolicitante = (CofreSolicitud) pedido.getcSolicito();
-			Item itemPedido = pedido.getItem();
-			int cantidadPedido = pedido.getCantidad();
-
-			// Buscar la red a la que pertenece el cofre solicitante
-			Red redCorrespondiente = null;
-			for (Red red : redes) {
-				if (red.getCofres().contains(cofreSolicitante)) {
-					redCorrespondiente = red;
-					break;
-				}
-			}
-
-			if (redCorrespondiente == null) {
-				// No se encontró la red, no se puede atender este pedido
-				continue;
-			}
-
-			// Buscar cofre de provisión activa que tenga stock suficiente
-			CofreProvisionActiva cofreAtendedor = null;
-			int maxStock = 0;
-
-			for (Cofre cofre : redCorrespondiente.getCofres()) {
-				if (cofre instanceof CofreProvisionActiva) {
-					CofreProvisionActiva cofreProvision = (CofreProvisionActiva) cofre;
-					int stockDisponible = cofreProvision.consultarStock(itemPedido);
-
-					// ESTA PARTE DEL CODIGO SE PODRIA MEJORAR
-					// El cofre que atiende es el que tenga mayor stock
-					if (stockDisponible >= cantidadPedido && stockDisponible > maxStock) {
-						maxStock = stockDisponible;
-						cofreAtendedor = cofreProvision;
-					}
-				}
-			}
-
-			if (cofreAtendedor != null) {
-				// Atendemos el pedido: descontamos stock y marcamos quién atendió
-				boolean pudoSacar = cofreAtendedor.sacarItem(itemPedido, cantidadPedido);
-				if (pudoSacar) {
-					pedido.AtenderPedido(cofreAtendedor);
-
-					// También descontamos la solicitud del cofre solicitante
-					cofreSolicitante.atenderSolicitud(itemPedido, cantidadPedido);
-				}
-			}
-			// Si no hay cofre que pueda atender, el pedido queda sin atender
-		}
-
-		return pedidos;
-	}
-*/
+	
+	
+	
+	
+	
 	
 //FIN
 }

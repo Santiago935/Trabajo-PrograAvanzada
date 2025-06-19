@@ -41,9 +41,10 @@ public class AlgoritmosGrafos {
     public static class Dijkstra_resultado {
         private final Map<Integer, Double> costos_minimos_double; // Se almacenan como double para el usuario
         private final Map<Integer, Integer> predecesores;
-
+        private final Map<Integer, Double> mejorBateriaConCostoMinimoDouble;
+        
         // El constructor ahora toma el mapa de costos mínimos con enteros escalados
-        public Dijkstra_resultado(Map<Integer, Integer> costos_minimos_int, Map<Integer, Integer> predecesores) {
+        public Dijkstra_resultado(Map<Integer, Integer> costos_minimos_int, Map<Integer, Integer> predecesores, Map<Integer, Integer> mejorBateriaConCostoMinimoInt) {
             this.costos_minimos_double = new HashMap<>();
             for (Map.Entry<Integer, Integer> entry : costos_minimos_int.entrySet()) {
                 if (entry.getValue() == Integer.MAX_VALUE) {
@@ -54,6 +55,16 @@ public class AlgoritmosGrafos {
                 }
             }
             this.predecesores = predecesores;
+            
+            // Convertimos la batería también a double
+            this.mejorBateriaConCostoMinimoDouble = new HashMap<>();
+            for (Map.Entry<Integer, Integer> entry : mejorBateriaConCostoMinimoInt.entrySet()) {
+                if (entry.getValue() == Integer.MAX_VALUE) {
+                    this.mejorBateriaConCostoMinimoDouble.put(entry.getKey(), Double.MAX_VALUE);
+                } else {
+                    this.mejorBateriaConCostoMinimoDouble.put(entry.getKey(), (double) entry.getValue() / FACTOR_PRECISION);
+                }
+            }
         }
 
         public Map<Integer, Double> getCostosMinimos() {
@@ -63,8 +74,12 @@ public class AlgoritmosGrafos {
         public Map<Integer, Integer> getPredecesores() {
             return predecesores;
         }
-        
-        // Mantén tu método imprimirDijkstraResultado o ajusta si es necesario
+
+		public Map<Integer, Double> getMejorBateriaConCostoMinimoDouble() {
+			return mejorBateriaConCostoMinimoDouble;
+		}
+
+		// Mantén tu método imprimirDijkstraResultado o ajusta si es necesario
         public static void imprimirDijkstraResultado(Dijkstra_resultado resultado) {
             if (resultado == null || resultado.costos_minimos_double == null || resultado.predecesores == null) {
                 System.out.println("Resultado de Dijkstra no válido o vacío.");
@@ -186,6 +201,6 @@ public class AlgoritmosGrafos {
             }
         }
         // Al final, se crea el Dijkstra_resultado, que internamente convertirá los costos a double
-        return new Dijkstra_resultado(costosMinimosInt, predecesores);
+        return new Dijkstra_resultado(costosMinimosInt, predecesores, mejorBateriaConCostoMinimoInt);
     }
 }
