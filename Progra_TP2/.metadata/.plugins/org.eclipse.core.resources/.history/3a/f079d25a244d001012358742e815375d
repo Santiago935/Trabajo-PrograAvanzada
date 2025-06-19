@@ -2,7 +2,9 @@ package resolucion;
 
 import cofres.*;
 import grafos.*;
+=======
 import cola_de_prioridad.TDA.Cola_prioridad_heap;
+>>>>>>> Stashed changes
 import importacion.*;
 import java.util.*;
 import red.*;

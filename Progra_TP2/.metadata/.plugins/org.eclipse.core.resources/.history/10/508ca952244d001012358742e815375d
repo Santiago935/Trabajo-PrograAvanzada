@@ -71,7 +71,9 @@ public class Robot {
 	}
 	
 
-
+<<<<<<< Updated upstream
+}
+=======
 	public boolean estaLibre() {
 		return viaje == null;
 	}
