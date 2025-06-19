@@ -1,10 +1,9 @@
 package resolucion;
 
-import grafos.*;
-import java.util.*;
-
 import cofres.*;
+import grafos.*;
 import importacion.*;
+import java.util.*;
 import red.*;
 import utiles.*;
 
@@ -18,6 +17,13 @@ public class Resolucion {
 
 		System.out.println("LOS ROBOPUERTOS SON:");
 		for (Robopuerto aux : robopuertos) {
+			System.out.println(aux);
+		}
+
+
+		System.out.println("LOS ROBOTS SON:");
+		ArrayList<Robot> robots = importador.leerArchivoRobots(robopuertos);
+		for(Robot aux : robots) {
 			System.out.println(aux);
 		}
 		System.out.println("--------------------");
@@ -51,28 +57,24 @@ public class Resolucion {
 		System.out.println("--------------------");
 
 		// Paso 4: cargar items en el sistema	
-		Item i1 = new Item(1000, "Microchips", "Microchips de silicio para ensamblaje");
-		Item i2 = new Item(2000, "Baterias", "Baterias de alta capacidad de litio");
-		Item item[] = {i1, i2};
-
-		System.out.println("LAS ITEMS SON:");
-		for (Item i : item) {
-			System.out.println(i);
+		System.out.println("LOS ITEMS SON:");
+		ArrayList<Item> listaItems = importador.leerArchivoItems();
+		for(Item aux : listaItems) {
+			System.out.println(aux);
 		}
-		System.out.println("--------------------");
 
 		// Como c1 y cpa1 estan en la misma red les creo un pedido y un ofrecimiento del mismo item
 		// Paso 5: cargar las solicitudes de los cofres:
-		c1.solicitarItem(i1, 100); // este sera atendido por el cofre cpa1
-		c1.solicitarItem(i2, 100); // este no lo voy a atender
+		c1.solicitarItem(listaItems.get(3), 100); // este sera atendido por el cofre cpa1
+		c1.solicitarItem(listaItems.get(4), 100); // este no lo voy a atender
 
 		// Paso 6: cargar que cofres ofrecen los items:
-		cpa1.guardarItem(i1, 100); // stock suficiente para atender c1
-		cpa1.agregarOferta(i1, 100); //Oferto SI PUEDO
+		cpa1.guardarItem(listaItems.get(3), 100); // stock suficiente para atender c1
+		cpa1.agregarOferta(listaItems.get(4), 100); //Oferto SI PUEDO
 
-		System.out.println("c1 pide item>>" + c1.consultarCantidadSolicitada(i1));
-		System.out.println("cp1 tiene item >>" + cpa1.tieneItem(i1));
-		System.out.println("cp1 tiene item>>" + cpa1.tieneItem(i2));
+		System.out.println("c1 pide item>>" + c1.consultarCantidadSolicitada(listaItems.get(3)));
+		System.out.println("cp1 tiene item >>" + cpa1.tieneItem(listaItems.get(3)));
+		System.out.println("cp1 tiene item>>>" + cpa1.tieneItem(listaItems.get(4)));
 
 		// Paso 7: armar los pedidos
 		//armamos los pedidos
@@ -84,9 +86,9 @@ public class Resolucion {
 		}
 
 		System.out.println("--------------------");
-		System.out.println(">>" + c1.consultarCantidadSolicitada(i1));
-		System.out.println(">>" + cpa1.tieneItem(i1));
-		System.out.println(">>" + cpa1.tieneItem(i2));
+		System.out.println(">>" + c1.consultarCantidadSolicitada(listaItems.get(3)));
+		System.out.println(">>" + cpa1.tieneItem(listaItems.get(3)));
+		System.out.println(">>" + cpa1.tieneItem(listaItems.get(4)));
 
 		// Paso 8: atender los pedidos
 
