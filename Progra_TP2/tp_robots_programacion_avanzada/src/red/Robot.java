@@ -10,6 +10,7 @@ public class Robot {
 	private double bateria;
 
 	public Robot(String id, Nodo nodo_inicial) {
+		this.id = id;
 		this.nodo_actual = nodo_inicial;
 		this.bateria = 100;
 		this.carga_actual = 0;
