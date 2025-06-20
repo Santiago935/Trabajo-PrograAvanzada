@@ -140,7 +140,6 @@ public class AlgoritmosGrafos {
         int bateriaMaximaInt = (int) Math.round(bateriaMaximaDouble * FACTOR_PRECISION);
 
 
-        //Inicializo para cada nodo del grafo, costo de llegada máximo, predecesor nulo y batería -1
         for (Nodo nodo : grafo.getNodos()) {
             costosMinimosInt.put(nodo.getId(), Integer.MAX_VALUE);
             predecesores.put(nodo.getId(), null);
@@ -160,9 +159,8 @@ public class AlgoritmosGrafos {
         
         costosMinimosInt.put(inicio.getId(), 0); // Costo inicial es 0 (0 * 100 = 0)
         mejorBateriaConCostoMinimoInt.put(inicio.getId(), bateriaInicialInt);
-        colaPrioridad.encolar(new EstadoNodo(inicio, 0, bateriaInicialInt)); //Arranco por el inicial
+        colaPrioridad.encolar(new EstadoNodo(inicio, 0, bateriaInicialInt));
 
-        //Empiezo a recorrer
         while (!colaPrioridad.estaVacia()) {
             EstadoNodo estadoActual = colaPrioridad.desencolar();
             Nodo nodoActual = estadoActual.getNodo();
@@ -170,10 +168,9 @@ public class AlgoritmosGrafos {
             int costoActualInt = estadoActual.getCostoAcumulado();
             int bateriaAlLlegarANodoActualInt = estadoActual.getBateriaAlLlegar();
 
-            // Si el costo es mayor o igual con peor estado de batería, no hago nada.
+            // Comparaciones directas con enteros
             if (costoActualInt > costosMinimosInt.get(idActual) ||
-                (costoActualInt == costosMinimosInt.get(idActual) 
-                && bateriaAlLlegarANodoActualInt < mejorBateriaConCostoMinimoInt.get(idActual))) {
+                (costoActualInt == costosMinimosInt.get(idActual) && bateriaAlLlegarANodoActualInt < mejorBateriaConCostoMinimoInt.get(idActual))) {
                 continue;
             }
 
@@ -182,28 +179,22 @@ public class AlgoritmosGrafos {
                 bateriaParaSalirDeActualInt = bateriaMaximaInt;
             }
 
-            //Para cada arista que tenga el nodo W
             for (Arista arista : grafo.getAristas_deNodo(nodoActual)) {
                 Nodo vecino = arista.getObjetivo();
                 int idVecino = vecino.getId();
                 // Convertir peso de arista (double) a entero escalado
                 int pesoAristaInt = (int) Math.round(arista.getPeso() * FACTOR_PRECISION);
 
-                //Si me alcanza la batería
                 if (bateriaParaSalirDeActualInt >= pesoAristaInt) {
                     int bateriaAlLlegarAVecinoInt = bateriaParaSalirDeActualInt - pesoAristaInt;
                     int nuevoCostoAVecinoInt = costoActualInt + pesoAristaInt;
-                    
-                    //Si mejora el costo o iguala el costo pero mejora la batería
+
                     if (nuevoCostoAVecinoInt < costosMinimosInt.get(idVecino) ||
                         (nuevoCostoAVecinoInt == costosMinimosInt.get(idVecino) && bateriaAlLlegarAVecinoInt > mejorBateriaConCostoMinimoInt.get(idVecino))) {
                         
-                    	//Actualizo costos, predecesores y batería
                         costosMinimosInt.put(idVecino, nuevoCostoAVecinoInt);
                         predecesores.put(idVecino, idActual); // Predecesor sigue siendo ID
                         mejorBateriaConCostoMinimoInt.put(idVecino, bateriaAlLlegarAVecinoInt);
-                        
-                        //nueva ruta a evaluar
                         colaPrioridad.encolar(new EstadoNodo(vecino, nuevoCostoAVecinoInt, bateriaAlLlegarAVecinoInt));
                     }
                 }
