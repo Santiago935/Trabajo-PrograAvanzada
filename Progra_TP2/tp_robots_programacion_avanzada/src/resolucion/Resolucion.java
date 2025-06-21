@@ -1,8 +1,8 @@
 package resolucion;
 
 import cofres.*;
-import grafos.*;
 import cola_de_prioridad.TDA.Cola_prioridad_heap;
+import grafos.*;
 import importacion.*;
 import java.util.*;
 import red.*;
@@ -14,7 +14,7 @@ public class Resolucion {
 
 	public static Cola_prioridad_heap<Pedido> obtenerPedidosOrdenados(ArrayList<Pedido> listaDesordenada) {
 		// Uso heap de mínimo para priorizar pedidos mas cortos
-		Cola_prioridad_heap<Pedido> pedidos = new Cola_prioridad_heap<Pedido>();
+		Cola_prioridad_heap<Pedido> pedidos = new Cola_prioridad_heap<>();
 
 		for (Pedido pedido : listaDesordenada) {
 			pedidos.encolar(pedido);
@@ -37,18 +37,7 @@ public class Resolucion {
 
 		// reemplazar por importado de cofres
 		// PASO 3: cargar cofres
-		CofreSolicitud c1 = new CofreSolicitud(2, 0, "C1"); // cerca de RP1
-		CofreSolicitud c2 = new CofreSolicitud(0, 7, "C2"); // cerca de RP1
-		CofreSolicitud c3 = new CofreSolicitud(20, 0, "C3"); // cerca de RP2
-		CofreSolicitud c4 = new CofreSolicitud(15, 7, "C4"); // cerca de RP2
-		CofreSolicitud c5 = new CofreSolicitud(8, 0, "C5"); // en medio, dentro de ambos (sin estar en límite)
-		CofreSolicitud c6 = new CofreSolicitud(50, 50, "C6"); // fuera de ambos
-
-		CofreProvisionActiva cpa1 = new CofreProvisionActiva(0, 1, "CPA1"); // cerca de RP 2
-
-		CofreBufer cb1 = new CofreBufer(2, 2, "CBufer1");
-
-		Cofre[] cofres = { c1, c2, c3, c4, c5, c6, cpa1, cb1 };
+		ArrayList<Cofre> cofres = importador.leerArchivoCofres();
 
 		// Paso 4: cargar items en el sistema
 		ArrayList<Item> listaItems = importador.leerArchivoItems();
@@ -64,36 +53,15 @@ public class Resolucion {
 		}
 		System.out.println("--------------------");
 
-		// Como c1 y cpa1 estan en la misma red les creo un pedido y un ofrecimiento del
-		// mismo item
-
 		// Paso 5: cargar las solicitudes de los cofres:
-		c1.solicitarItem(listaItems.get(3), 100); // este sera atendido por el cofre cpa1
-		c1.solicitarItem(listaItems.get(4), 70); // este no lo voy a atender
+		importador.leerArchivoPedidos(listaItems,cofres);
+	
 
-		// Paso 6: cargar que cofres ofrecen los items:
-		cpa1.guardarItem(listaItems.get(3), 200); // stock suficiente para atender c1
-		cpa1.agregarOferta(listaItems.get(3), 150); // Oferto SI PUEDO
+		//A PARTIR DE AQUI NO ENTIENDO COMO SIGUE
+		// Paso 6: armar los pedidos
+		// armamos los pedidos ?
 
-		//comentar y descomentar para comprobar cambio de prioridad de cofre que oferta
-//		cpa1.guardarItem(listaItems.get(4), 200); // stock suficiente para atender c1
-//		cpa1.agregarOferta(listaItems.get(4), 150); // Oferto SI PUEDO
-
-		cb1.guardarItem(listaItems.get(4), 100);
-		cb1.agregarOferta(listaItems.get(4), 100);
-
-		System.out.println("\nEJEMPLO DE PEDIDO:");
-		System.out.println(
-				"c1 cuanto solicita de -> " + c1.cuantoSolicita(listaItems.get(3)) + " De ---> " + listaItems.get(3));
-		System.out.println(
-				"c1 cuanto solicita de -> " + c1.cuantoSolicita(listaItems.get(4)) + " De ---> " + listaItems.get(4));
-		System.out.println(
-				"cp1 oferta item   -> " + cpa1.cuantoOfrece(listaItems.get(3)) + " De --->" + listaItems.get(3));
-		System.out.println(
-				"cofre buffer oferta item  -> " + cb1.cuantoOfrece(listaItems.get(4)) + " De --->" + listaItems.get(4));
-
-		// Paso 7: armar los pedidos
-		// armamos los pedidos
+		
 
 		System.out.println("\n\n--------------------");
 		System.out.println("ARMADO DE PEDIDOS:");
@@ -104,33 +72,19 @@ public class Resolucion {
 		System.out.println("--------------------");
 
 		System.out.println("\nPOST ARMADO DE PEDIDOS");
-		System.out.println(
-				"c1 tiene del item -> " + c1.consultarItem(listaItems.get(3)) + " De ---> " + listaItems.get(3));
-		System.out.println(
-				"c1 solicita del item     -> " + c1.cuantoSolicita(listaItems.get(3)) + " De ---> " + listaItems.get(3));
-		System.out.println(
-				"c1 tiene del item -> " + c1.consultarItem(listaItems.get(4)) + " De ---> " + listaItems.get(4));
-		System.out.println(
-				"c1 solicita del item     -> " + c1.cuantoSolicita(listaItems.get(4)) + " De ---> " + listaItems.get(4));
-		System.out.println(
-				"cp1 tiene del item   -> " + cpa1.consultarItem(listaItems.get(3)) + " De --->" + listaItems.get(3));
-		System.out.println(
-				"cp1 oferta del item  -> " + cpa1.cuantoOfrece(listaItems.get(3)) + " De --->" + listaItems.get(3));
-		System.out.println(
-				"cofre bufer tiene del item   -> " + cb1.consultarItem(listaItems.get(4)) + " De --->" + listaItems.get(4));
-		System.out.println(
-				"cofre bufer oferta del item  -> " + cb1.cuantoOfrece(listaItems.get(4)) + " De --->" + listaItems.get(4));
+
 
 
 		// Paso 8: atender los pedidos
 
 		// ArrayList<Grafo> grafos = ArmadoRed.generarGrafos(redes);
 		// pruebaDijkstraModificado();
+	
 
 		System.out.println("\nHOLA MUNDO, FIN DEL TP...");
 	}
 
-	public static void mostrarEntorno(ArrayList<Robopuerto> robopuertos, ArrayList<Robot> robots, Cofre[] cofres,
+	public static void mostrarEntorno(ArrayList<Robopuerto> robopuertos, ArrayList<Robot> robots, ArrayList<Cofre> cofres,
 			ArrayList<Item> listaItems) {
 
 		System.out.println("LOS ROBOPUERTOS SON:");
@@ -146,11 +100,10 @@ public class Resolucion {
 		System.out.println("--------------------");
 
 		System.out.println("\nLOS COFRES SON:");
-		for (int i = 0; i < cofres.length; i++) {
-			System.out.println(cofres[i]);
+		for (Cofre aux : cofres) {
+			System.out.println(aux);
 		}
 		System.out.println("--------------------");
-
 		System.out.println("\nLOS ITEMS SON:");
 		for (Item aux : listaItems) {
 			System.out.println(aux);

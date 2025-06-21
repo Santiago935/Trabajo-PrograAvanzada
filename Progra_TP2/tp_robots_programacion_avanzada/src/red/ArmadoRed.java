@@ -1,18 +1,17 @@
 package red;
 
-import java.util.*;
-
 import cofres.Cofre;
 import grafos.Grafo;
+import java.util.*;
 
 public class ArmadoRed {
 	// -------------------------------------------------------------------------------------------
 	// Metodos para la configuración inicial de la red
 	// -------------------------------------------------------------------------------------------
 
-	public static ArrayList<Red> armado_redes(ArrayList<Robopuerto> robopuertos, Cofre[] cofres,
+	public static ArrayList<Red> armado_redes(ArrayList<Robopuerto> robopuertos, ArrayList<Cofre> cofres,
 			ArrayList<Robot> robots) {
-		ArrayList<Red> lista_redes = new ArrayList<Red>();
+		ArrayList<Red> lista_redes = new ArrayList<>();
 		int i = 1;
 
 		for (Robopuerto rb : robopuertos) {
@@ -50,13 +49,11 @@ public class ArmadoRed {
 		double radio1 = rb1.getRadio();
 		double radio2 = rb2.getRadio();
 
-		if (Coordenada.distancia_eucladiana(coord1, coord2) < radio1 + radio2)
-			return true;
-		return false;
+		return Coordenada.distancia_eucladiana(coord1, coord2) < radio1 + radio2;
 	}
 
-	public static void armado_cofres(ArrayList<Red> redes, Cofre[] cofres) {
-		Set<Cofre> visitados = new HashSet<Cofre>();
+	public static void armado_cofres(ArrayList<Red> redes, ArrayList<Cofre> cofres) {
+		Set<Cofre> visitados = new HashSet<>();
 
 		for (Red red : redes) {
 			for (Robopuerto rb : red.getRobopuertos()) {
