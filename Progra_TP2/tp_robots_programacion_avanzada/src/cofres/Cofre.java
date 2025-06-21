@@ -10,7 +10,7 @@ import utiles.Item;
 
 //Cofre clase abstracta que podra ser un cofre de un tipo y comportamiento especifico
 public abstract class Cofre implements Red.ComponenteRed {
-	private String id;
+	private final String id;
 	private final Coordenada coordenada;
 	private final Nodo nodo;
 	protected HashMap<Item, Integer> items; // listado de items que tendra el cofre internamente
@@ -60,7 +60,8 @@ public abstract class Cofre implements Red.ComponenteRed {
 
 	@Override
 	public String toString() {
-		return "Cofre [id=" + id + ", coordenada=" + coordenada + ", nodo=" + nodo + "]";
+		return String.format("Cofre[id=%s, coord=(x=%d, y=%d), nodo=%s, tipo=%s]", id, coordenada.getX(),
+				coordenada.getY(), nodo.getAlias(), this.getClass().getSimpleName());
 	}
 
 	@Override
@@ -78,12 +79,20 @@ public abstract class Cofre implements Red.ComponenteRed {
 		return id.hashCode();
 	}
 
-	public abstract boolean aceptarSolicitud(Item item, int cantidadSolicitada);
-
-	public abstract int consultarStock(Item item);
-
 	public void guardarItem(Item item, int cantidad) {
 		items.put(item, items.getOrDefault(item, 0) + cantidad);
+	}
+
+	public int consultarItem(Item item) {
+		return items.getOrDefault(item, 0);
+	}
+
+	public void descontarItem(Item item, int cantidad) {
+		int cant = items.getOrDefault(item, 0);
+
+		if (cant >= cantidad)
+			items.put(item, cant - cantidad);
+
 	}
 
 }

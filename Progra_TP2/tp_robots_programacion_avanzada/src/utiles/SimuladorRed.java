@@ -76,7 +76,7 @@ public class SimuladorRed {
 		for (Robot r : llevandoItem) {
 			r.avanzarUnTurno(this);
 			if (r.estaEnDestino()) {
-				Cofre cofreDestino = r.getPedidoActual().getcAtendio();
+			//	Cofre cofreDestino = r.getPedidoActual().getcAtendio();
 				//cofre.interactuarConRobot(r);
 				listosParaDescargar.add(r);
 				r.finalizarViaje();
@@ -134,29 +134,29 @@ public class SimuladorRed {
 			this.bateriaLlegada = bateriaLlegada;
 		}
 
-		public Robot getRobot() {
-			return robot;
-		}
+//		public Robot getRobot() {
+//			return robot;
+//		}
 
-		public void setRobot(Robot robot) {
-			this.robot = robot;
-		}
+//		public void setRobot(Robot robot) {
+//			this.robot = robot;
+//		}
 
 		public Double getDistanciaMinima() {
 			return distanciaMinima;
 		}
 
-		public void setDistanciaMinima(Double distanciaMinima) {
-			this.distanciaMinima = distanciaMinima;
-		}
+//		public void setDistanciaMinima(Double distanciaMinima) {
+//			this.distanciaMinima = distanciaMinima;
+//		}
 
 		public Double getBateriaLlegada() {
 			return bateriaLlegada;
 		}
 
-		public void setBateriaLlegada(Double bateriaLlegada) {
-			this.bateriaLlegada = bateriaLlegada;
-		}
+//		public void setBateriaLlegada(Double bateriaLlegada) {
+//			this.bateriaLlegada = bateriaLlegada;
+//		}
 	}
 
 	public RobotElegido calcularRuta(Robot robot, Cofre cofre, Grafo grafo) {

@@ -26,7 +26,7 @@ public class Item {
 
 	@Override
 	public String toString() {
-		return "Item [id=" + id + ", nombre=" + nombre + "]";
+		return String.format("Item[id=%s, nombre=%s]", id, nombre);
 	}
 
 }

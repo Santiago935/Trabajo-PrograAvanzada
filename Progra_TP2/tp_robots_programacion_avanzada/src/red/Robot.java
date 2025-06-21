@@ -9,15 +9,15 @@ public class Robot {
 	private int carga_actual;
 	private Nodo nodo_actual;
 	private double bateria;
-
+	private String idRPInicial;
 	private Viaje viaje;
-	
-	
+
 	public Robot(String id, Nodo nodo_inicial) {
 		this.id = id;
 		this.nodo_actual = nodo_inicial;
 		this.bateria = 100;
 		this.carga_actual = 0;
+		this.idRPInicial = nodo_inicial.getAlias();
 	}
 
 	public void viajar(Nodo nodo_destino, double costo) {
@@ -57,20 +57,25 @@ public class Robot {
 		return bateria;
 	}
 
-	@Override
-	public String toString() {
-		return "Robot [id=" + id + ", carga_actual=" + carga_actual + "]";
+	public String getIdRPInicial() {
+		return idRPInicial;
 	}
 
-	
-	
-	//METODOS DE VIAJE ---------------------------------------------------
+	@Override
+	public String toString() {
+	    return String.format(
+	        "Robot[id=%s, carga_actual=%d, robo_puerto_inicial=%s]",
+	        id,
+	        carga_actual,
+	        idRPInicial != null ? idRPInicial : "(no asignado)"
+	    );
+	}
+
+	// METODOS DE VIAJE ---------------------------------------------------
 
 	public Pedido getPedidoActual() {
 		return viaje != null ? viaje.getPedido() : null;
 	}
-	
-
 
 	public boolean estaLibre() {
 		return viaje == null;
@@ -86,9 +91,8 @@ public class Robot {
 		}
 	}
 
-	public boolean estaEnDestino()
-	{
-		if(viaje != null && viaje.getPasosRestantes()==0)
+	public boolean estaEnDestino() {
+		if (viaje != null && viaje.getPasosRestantes() == 0)
 			return true;
 		return false;
 	}
@@ -97,13 +101,11 @@ public class Robot {
 		if (viaje != null) {
 			this.nodo_actual = viaje.getDestino();
 			this.bateria = viaje.getBateriaFinal();
-			
-			//INTERACTUAR CON EL COFRE
-			
+
+			// INTERACTUAR CON EL COFRE
+
 			this.viaje = null;
 		}
 	}
-	
-	
-}
 
+}

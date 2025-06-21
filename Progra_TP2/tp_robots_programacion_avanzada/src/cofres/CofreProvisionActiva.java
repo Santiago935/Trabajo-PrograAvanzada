@@ -4,56 +4,43 @@ import java.util.HashMap;
 
 import utiles.Item;
 
-public class CofreProvisionActiva extends Cofre {
-	private HashMap<Item, Integer> itemsOfrecidos; //Diferentes de los que realmente tiene
-	
-    public CofreProvisionActiva(int x, int y, String id) {
-        super(x, y, id);
-        itemsOfrecidos = new HashMap<Item, Integer>();
-    }
+public class CofreProvisionActiva extends Cofre implements PuedeOfertar {
+	private HashMap<Item, Integer> itemsOfrecidos; // Diferentes de los que realmente tiene
 
-    public HashMap<Item, Integer> ofertaDeItems()
-    {
-    	return this.items;
-    }
-    
-    
-    @Override
-	public boolean aceptarSolicitud(Item item, int cantidadSolicitada) {
-		int cantEnStock = itemsOfrecidos.getOrDefault(item, 0);
-		
-		if(cantidadSolicitada > cantEnStock)
-			return false;
-		
-		itemsOfrecidos.put(item, cantEnStock - cantidadSolicitada);
-		return true;
-				}
-
-
-    //Pisamos el toString super y hacemos el especifico
-	@Override
-	public String toString() {
-		return "Cofre [id=" + getId() + 
-				", coordenada=" + getCoordenada() + 
-				", nodo=" + getNodo() + 
-				", tipo= CofreProvisionActiva" + 
-				"]";
+	public CofreProvisionActiva(int x, int y, String id) {
+		super(x, y, id);
+		itemsOfrecidos = new HashMap<Item, Integer>();
 	}
 
+	public HashMap<Item, Integer> ofertaDeItems() {
+		return this.items;
+	}
+
+	// Implementamos interfaz
 	@Override
-	public  int consultarStock(Item item) {
+	public int cuantoOfrece(Item item) {
 		return itemsOfrecidos.getOrDefault(item, 0);
 	}
-	
-    public boolean agregarOferta(Item item, int cantidad) {
-    	int stock = items.getOrDefault(item, 0);
-    	int cantidadNecesaria = cantidad + itemsOfrecidos.getOrDefault(item, 0);
-    	
-    	if( stock < cantidadNecesaria ) {
-    		return false;
-    	}
-    	itemsOfrecidos.put(item, cantidadNecesaria);
-    	return true;
-    }
-	
+
+	@Override
+	public boolean reservarItem(Item item, int cantidad) {
+		int cantEnStock = itemsOfrecidos.getOrDefault(item, 0);
+		if (cantidad > cantEnStock)
+			return false;
+
+		itemsOfrecidos.put(item, cantEnStock - cantidad); // Descontamos lo ofrecido
+		return true;
+	}
+
+	public boolean agregarOferta(Item item, int cantidad) {
+		int stock = items.getOrDefault(item, 0);
+		int cantidadNecesaria = cantidad + itemsOfrecidos.getOrDefault(item, 0);
+
+		if (stock < cantidadNecesaria) {
+			return false;
+		}
+		itemsOfrecidos.put(item, cantidadNecesaria);
+		return true;
+	}
+
 }

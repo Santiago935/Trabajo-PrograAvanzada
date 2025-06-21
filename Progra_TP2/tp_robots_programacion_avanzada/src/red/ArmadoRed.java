@@ -10,7 +10,8 @@ public class ArmadoRed {
 	// Metodos para la configuración inicial de la red
 	// -------------------------------------------------------------------------------------------
 
-	public static ArrayList<Red> armado_redes(ArrayList<Robopuerto> robopuertos, Cofre[] cofres) {
+	public static ArrayList<Red> armado_redes(ArrayList<Robopuerto> robopuertos, Cofre[] cofres,
+			ArrayList<Robot> robots) {
 		ArrayList<Red> lista_redes = new ArrayList<Red>();
 		int i = 1;
 
@@ -36,7 +37,9 @@ public class ArmadoRed {
 		}
 
 		armado_cofres(lista_redes, cofres);
-		
+
+		armado_robots(lista_redes, robots);
+
 		return lista_redes;
 	}
 
@@ -68,6 +71,27 @@ public class ArmadoRed {
 				}
 			}
 		}
+	}
+
+	public static void armado_robots(ArrayList<Red> redes, ArrayList<Robot> robots) {
+
+		for (Robot robot : robots) {
+			String idRP = robot.getIdRPInicial();
+			boolean encontrado = false;
+
+			for (Red red : redes) {
+				for (Robopuerto rp : red.getRobopuertos()) {
+					if (rp.getId().equals(idRP)) {
+						red.add_robot(robot); // agrego robot a la red
+						encontrado = true; // si ya encontre la red a la que pertence no sigo buscando
+						break;
+					}
+				}
+				if (encontrado)
+					break;
+			}
+		}
+
 	}
 
 	public static ArrayList<Grafo> generarGrafos(ArrayList<Red> redes) {

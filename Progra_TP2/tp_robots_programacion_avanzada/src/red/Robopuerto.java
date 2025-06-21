@@ -34,6 +34,14 @@ public class Robopuerto implements Red.ComponenteRed{
 
 	@Override
 	public String toString() {
-		return "Robopuerto [id=" + id + ", coordenada=" + coordenada + ", nodo=" + nodo + ", radio=" + radio + "]";
+	    return String.format(
+	        "Robopuerto[id=%s, coord=(x=%d, y=%d), nodo=%s, radio=%.1f]",
+	        id,
+	        coordenada.getX(),
+	        coordenada.getY(),
+	        nodo.getAlias(), // o nodo.toString() si preferís, pero legible
+	        radio
+	    );
 	}
+
 }
