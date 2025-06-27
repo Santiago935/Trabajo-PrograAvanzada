@@ -3,6 +3,7 @@ package pruebasUnitarias;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +13,7 @@ import grafos.*;
 public class clasesGrafosTests {
 	
 	private Nodo nodo1, nodo2, nodo3, nodo4, nodo5;
-	private Arista arista1;
-	private Grafo grafo1;
+	private Grafo grafoNoDirigido, grafoDirigido;
 
 	@Before
 	public void setUp() {
@@ -23,105 +23,103 @@ public class clasesGrafosTests {
 	    nodo4 = new Nodo(04, "Nodo Corsuceano");
 	    nodo5 = new Nodo(05, "Nodo Nabooeano");
 	    
-	    arista1 = new Arista(nodo2, -4);
 	    
-	    grafo1 = new Grafo(false);
+	    grafoNoDirigido = new Grafo(false);
+        grafoDirigido = new Grafo(true);
 
 	}
 
 
-	@Test
-	public void claseNodo() {
-		assertEquals("Test1: El id del nodo no es el insertado",nodo1.getId(), 01);
-		assertEquals("Test2: El Alias del nodo no es el insertado",nodo1.getAlias(), "Nodo de la Muerte");
-	}
-	
 
-	@Test
-	public void claseArista() {
-		assertEquals("Test1: No esta devolviendo el Nodo Objetivo",arista1.getObjetivo(), nodo2);
-		assertEquals("Test2: No esta devolviendo el peso inicial",arista1.getPeso(), -4, 0.001);
-		arista1.setPeso(7.3);
-		assertEquals("Test3: no funciona el metodo setPeso()",arista1.getPeso(), 7.3, 0.001);
-
-	}
-	
 	@Test(expected = IllegalArgumentException.class)
-	public void grafoNodoRepetido() {
-	    grafo1.addNodo(nodo1);
-	    grafo1.addNodo(nodo1); // debería lanzar la excepción
-	}
-	
-	@Test
-	public void grafoVecinos() {
-		
-		 
-		//Testeo si funciona 
-		grafo1.addNodo(nodo1);
-		grafo1.addNodo(nodo2);
-		grafo1.addNodo(nodo3);
-		grafo1.addNodo(nodo4);
-		grafo1.addArista(nodo2, nodo1, 5);
-		grafo1.addArista(nodo1, nodo4, 10);
-		grafo1.addArista(nodo3, nodo4, 50);
-		
-		Set<Nodo> nodosVecinos = grafo1.getVecinos(nodo1);
-		
-		
-		assertTrue("No conecta bien con nodo2",nodosVecinos.contains(nodo2));
-		  assertTrue("No conecta bien con nodo4",nodosVecinos.contains(nodo4));
-		  assertEquals("El tamaño que devuelve no es correcto",2, nodosVecinos.size());
-	      nodosVecinos = grafo1.getVecinos(nodo4);
-	      assertFalse("nodo4 no deberia conectar con nodo2",nodosVecinos.contains(nodo2));
-	      assertTrue("No conecta bien con nodo4",nodosVecinos.contains(nodo3));
-	      assertTrue("No conecta bien con nodo4",nodosVecinos.contains(nodo1));
-	      assertEquals("El tamaño que devuelve no es correcto",2, nodosVecinos.size());
-		
-	}
-	
-	@Test
-	public void grafoGetNodos() {
-		
-		grafo1.addNodo(nodo1);
-		grafo1.addNodo(nodo2);
-		grafo1.addNodo(nodo3);
-		grafo1.addNodo(nodo4);
-		
-		Set <Nodo> listaNodos = grafo1.getNodos();
-		assertTrue("No contiene nodo1", listaNodos.contains(nodo1));
-		assertTrue("No contiene nodo2", listaNodos.contains(nodo2));
-		assertTrue("No contiene nodo3", listaNodos.contains(nodo3));
-		assertTrue("No contiene nodo4", listaNodos.contains(nodo4));
-		assertEquals("El tamaño que devuelve no es correcto",4, listaNodos.size());
-	}
-	
-	@Test
-	public void grafoGetArista() {
-	    grafo1.addNodo(nodo1);
-	    grafo1.addNodo(nodo2);
-	    grafo1.addNodo(nodo3);
-	    grafo1.addNodo(nodo4);
-	    grafo1.addNodo(nodo5);
+    public void insertarNodoRepetido() {
+        grafoNoDirigido.addNodo(nodo1);
+        grafoNoDirigido.addNodo(nodo1); 
+    }
 
-	    grafo1.addArista(nodo2, nodo1, 5);
-	    grafo1.addArista(nodo5, nodo1, -5);
-	    grafo1.addArista(nodo1, nodo4, 10);
-	    grafo1.addArista(nodo3, nodo4, 50);
+    @Test
+    public void grafoGetNodos() {
+        grafoNoDirigido.addNodo(nodo1);
+        grafoNoDirigido.addNodo(nodo2);
+        grafoNoDirigido.addNodo(nodo3);
 
-	    List<Arista> aristasNodo1 = grafo1.getAristas_deNodo(nodo1);
+        Set<Nodo> listaNodos = grafoNoDirigido.getNodos();
+        assertTrue("Test1: Deberia contener al nodo1", listaNodos.contains(nodo1));
+        assertTrue("Test2: Deberia contener al nodo1", listaNodos.contains(nodo2));
+        assertTrue("Test3: Deberia contener al nodo1", listaNodos.contains(nodo3));
+        assertFalse("Test4: No debería contener nodo4", listaNodos.contains(nodo4));
+        assertEquals("Test5: El tamaño que devuelve deberia ser 3", 3, listaNodos.size());
+    }
 
-	    assertTrue("No contiene arista hacia nodo4", aristasNodo1.stream().anyMatch(arista -> arista.getObjetivo().equals(nodo4)));
+    @Test
+    public void gNoDirigidoGetVecinos() {
+        grafoNoDirigido.addNodo(nodo1);
+        grafoNoDirigido.addNodo(nodo2);
+        grafoNoDirigido.addNodo(nodo3);
+        grafoNoDirigido.addNodo(nodo4);
+        grafoNoDirigido.addArista(nodo1, nodo2, 5);
+        grafoNoDirigido.addArista(nodo1, nodo4, 10);
 
-	    List<Arista> aristasNodo2 = grafo1.getAristas_deNodo(nodo2);
-	    assertTrue("No contiene arista hacia nodo1 desde nodo2", aristasNodo2.stream().anyMatch(arista -> arista.getObjetivo().equals(nodo1)));
+        Set<Nodo> vecinos1 = grafoNoDirigido.getVecinos(nodo1);
+        assertEquals("Test1: El tamaño del grafo deberia ser 2", 2, vecinos1.size());
+        assertTrue("Test2: nodo1 no conecta bien con nodo2", vecinos1.contains(nodo2));
+        assertTrue("Test3: nodo1 no conecta bien con nodo4", vecinos1.contains(nodo4));
 
-	    List<Arista> aristasNodo5 = grafo1.getAristas_deNodo(nodo5);
-	    assertTrue("No contiene arista hacia nodo1 desde nodo5", aristasNodo5.stream().anyMatch(arista -> arista.getObjetivo().equals(nodo1)));
+        Set<Nodo> vecinos2 = grafoNoDirigido.getVecinos(nodo2);
+        assertEquals("Test4: El tamaño de vecinos de nodo2 no es correcto", 1, vecinos2.size());
+        assertTrue("Test5: nodo2 no conecta bien con nodo1", vecinos2.contains(nodo1));
+    }
 
-	    List<Arista> aristasNodo3 = grafo1.getAristas_deNodo(nodo3);
-	    assertTrue("No contiene arista hacia nodo4 desde nodo3", aristasNodo3.stream().anyMatch(arista -> arista.getObjetivo().equals(nodo4)));
-	}
+    @Test
+    public void gDirigidoGetVecinos() {
+        grafoDirigido.addNodo(nodo1);
+        grafoDirigido.addNodo(nodo2);
+        grafoDirigido.addNodo(nodo4);
+        grafoDirigido.addArista(nodo1, nodo2, 5);
+        grafoDirigido.addArista(nodo1, nodo4, 10);
+
+        Set<Nodo> vecinos1 = grafoDirigido.getVecinos(nodo1);
+        assertEquals("Test1: El tamaño de vecinos de nodo1 no es correcto", 2, vecinos1.size());
+        assertTrue("Test2: nodo1 deberia ser vecino de nodo2", vecinos1.contains(nodo2));
+        assertTrue("Test3: nodo1 deberia ser vecino de nodo4", vecinos1.contains(nodo4));
+
+        Set<Nodo> vecinos2 = grafoDirigido.getVecinos(nodo2);
+        assertTrue("Test4: nodo2 no debería tener vecinos de salida ya que es un grafo dirigido", vecinos2.isEmpty());
+    }
+    
+    @Test
+    public void getVecinosDeNodoAislado() {
+        grafoNoDirigido.addNodo(nodo1);
+        grafoNoDirigido.addNodo(nodo2);
+        grafoNoDirigido.addArista(nodo1, nodo2, 10);
+        
+
+        grafoNoDirigido.addNodo(nodo3);
+        Set<Nodo> vecinos3 = grafoNoDirigido.getVecinos(nodo3);
+        assertTrue("Test1: Un nodo aislado no debe tener vecinos", vecinos3.isEmpty());
+    }
+
+    @Test
+    public void getVecinosDeNodoInexistente() {
+        grafoNoDirigido.addNodo(nodo1);
+        Set<Nodo> vecinos5 = grafoNoDirigido.getVecinos(nodo5);
+        assertTrue("Test1: Un nodo que no existe en el grafo no debe tener vecinos", vecinos5.isEmpty());
+    }
 
 
+    @Test
+    public void gNoDirigidoGetAristasdeNodo() {
+        grafoNoDirigido.addNodo(nodo1);
+        grafoNoDirigido.addNodo(nodo2);
+        grafoNoDirigido.addNodo(nodo4);
+        grafoNoDirigido.addArista(nodo1, nodo2, 5);
+        grafoNoDirigido.addArista(nodo1, nodo4, 10);
+
+        List<Arista> aristas1 = grafoNoDirigido.getAristas_deNodo(nodo1);
+        assertEquals("Test1: El número de aristas de nodo1 es incorrecto", 2, aristas1.size());
+        Set<Integer> idsDestino = aristas1.stream().map(a -> a.getObjetivo().getId()).collect(Collectors.toSet());
+        assertTrue("Test2: Falta arista de nodo1 a nodo2", idsDestino.contains(nodo2.getId()));
+        assertTrue("Test3: Falta arista de nodo1 a nodo4", idsDestino.contains(nodo4.getId()));
+    }
 	
 }
