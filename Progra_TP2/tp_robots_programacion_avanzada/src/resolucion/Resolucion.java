@@ -1,12 +1,21 @@
 package resolucion;
 
-import cofres.*;
+import cofres.Cofre;
 import cola_de_prioridad.TDA.Cola_prioridad_heap;
-import grafos.*;
-import importacion.*;
-import java.util.*;
-import red.*;
-import utiles.*;
+import grafos.AlgoritmosGrafos;
+import grafos.Grafo;
+import grafos.Nodo;
+import importaciones.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import red.ArmadoRed;
+import red.Red;
+import red.Robopuerto;
+import red.Robot;
+import utiles.Item;
+import utiles.Pedido;
 
 public class Resolucion {
 
@@ -27,7 +36,7 @@ public class Resolucion {
 
 	public static void main(String[] args) {
 
-		ImportarArchivos importador = new ImportarArchivos();
+		Importar importador = new Importar();
 
 		// PASO 1: cargar robopuertos
 		ArrayList<Robopuerto> robopuertos = importador.leerArchivoRobopuertos();
@@ -53,15 +62,14 @@ public class Resolucion {
 		}
 		System.out.println("--------------------");
 
-		// Paso 5: cargar las solicitudes de los cofres:
-		importador.leerArchivoPedidos(listaItems,cofres);
-	
+		// Paso 5: cargar Stock de los cofres:
+		importador.leerArchivoStock(listaItems,cofres);
 
-		//A PARTIR DE AQUI NO ENTIENDO COMO SIGUE
-		// Paso 6: armar los pedidos
-		// armamos los pedidos ?
+		// Paso 6: armar las Ofertas
+		importador.leerArchivoOferta(listaItems,cofres);
 
-		
+		//Paso 7: importar las solicitudes:
+		importador.leerArchivoSolicitud(listaItems,cofres);
 
 		System.out.println("\n\n--------------------");
 		System.out.println("ARMADO DE PEDIDOS:");
@@ -79,7 +87,7 @@ public class Resolucion {
 
 		// ArrayList<Grafo> grafos = ArmadoRed.generarGrafos(redes);
 		// pruebaDijkstraModificado();
-	
+
 
 		System.out.println("\nHOLA MUNDO, FIN DEL TP...");
 	}
@@ -113,20 +121,20 @@ public class Resolucion {
 	}
 
 	/*
-	 * 
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
 	 * ArrayList<Robopuerto> robopuertos = new ArrayList<>(Arrays.asList(rp1, rp2,
 	 * rp3, rp4)); Cofre[] cofres = { c1, c2 , c3, c4};
-	 * 
+	 *
 	 * // Crear redes y agregar cofres ArrayList<Red> redes =
 	 * ArmadoRed.armado_redes(robopuertos, cofres); ArmadoRed.armado_cofres(redes,
 	 * cofres);
-	 * 
+	 *
 	 * // Generar grafos para cada red ArrayList<Grafo> grafos =
 	 * ArmadoRed.generarGrafos(redes);
-	 * 
+	 *
 	 * // Imprimir redes y grafos para verificar distancias for (int i = 0; i <
 	 * redes.size(); i++) { Red red = redes.get(i); System.out.println("=== Red " +
 	 * (i + 1) + " ==="); System.out.println("Robopuertos:"); for (Robopuerto rp :
@@ -134,7 +142,7 @@ public class Resolucion {
 	 * System.out.println("Cofres:"); for (Cofre cofre : red.getCofres()) {
 	 * System.out.println(" - " + cofre); } System.out.println("Grafo:");
 	 * grafos.get(i).imprimirGrafo();
-	 * 
+	 *
 	 * } }
 	 */
 
@@ -203,7 +211,7 @@ public class Resolucion {
 		AlgoritmosGrafos.Dijkstra_resultado.imprimirDijkstraResultado(res3);
 
 		/*
-		 * 
+		 *
 		 * // --- Caso 4: Robopuerto no ayuda si no hay camino o batería para llegar a
 		 * él --- Grafo g4 = new Grafo(); Nodo n4_1 = new Nodo(1); g4.agregarNodo(n4_1);
 		 * Nodo n4_2_rp = new Nodo(2); g4.agregarNodo(n4_2_rp); Nodo n4_3 = new Nodo(3);
@@ -213,7 +221,7 @@ public class Resolucion {
 		 * AlgoritmosGrafos.dijkstraConBateria(g4, n4_1, 10.0, 20.0, rp4); // Bat
 		 * inicial 10, no llega al RP
 		 * imprimirResultadoPrueba("No alcanza al Robopuerto", res4, 3, null, null);
-		 * 
+		 *
 		 * // --- Caso 5: Dos caminos, uno más corto pero agota batería, otro más largo
 		 * usa RP --- Grafo g5 = new Grafo(); Nodo n5_1 = new Nodo(1);
 		 * g5.agregarNodo(n5_1); // Inicio Nodo n5_2 = new Nodo(2);
@@ -230,7 +238,7 @@ public class Resolucion {
 		 * AlgoritmosGrafos.dijkstraConBateria(g5, n5_1, 5.0, 10.0, rp5);
 		 * imprimirResultadoPrueba("Camino corto sin batería vs. largo con RP", res5, 4,
 		 * 8.0, Arrays.asList(1, 3, 4));
-		 * 
+		 *
 		 * // --- Caso 6: Nodo aislado / Destino inalcanzable --- Grafo g6 = new
 		 * Grafo(); Nodo n6_1 = new Nodo(1); g6.agregarNodo(n6_1); Nodo n6_2 = new
 		 * Nodo(2); g6.agregarNodo(n6_2); Nodo n6_3 = new Nodo(3); g6.agregarNodo(n6_3);
@@ -238,7 +246,7 @@ public class Resolucion {
 		 * Set<Integer> rp6 = new HashSet<>(); AlgoritmosGrafos.Dijkstra_resultado res6
 		 * = AlgoritmosGrafos.dijkstraConBateria(g6, n6_1, 10.0, 20.0, rp6);
 		 * imprimirResultadoPrueba("Destino Aislado", res6, 3, null, null);
-		 * 
+		 *
 		 * // --- Caso 7: Mismo costo, preferir camino que deja más batería (implícito
 		 * por la lógica de relajación) --- // Esto es más sutil. La lógica de
 		 * `mejorBateriaConCostoMinimo` asegura que si // se llega a un nodo intermedio
@@ -252,57 +260,57 @@ public class Resolucion {
 		 * g7.agregarNodo(n7_3); // Intermedio B Nodo n7_4 = new Nodo(4);
 		 * g7.agregarNodo(n7_4); // Punto de unión (M) Nodo n7_5 = new Nodo(5);
 		 * g7.agregarNodo(n7_5); // Destino
-		 * 
+		 *
 		 * // Camino 1 -> 2 -> 4 g7.agregarArista(n7_1, n7_2, 2.0); // 1->2 (Costo 2)
 		 * g7.agregarArista(n7_2, n7_4, 3.0); // 2->4 (Costo 3) -> Llega a 4 con costo 5
 		 * por esta vía
-		 * 
+		 *
 		 * // Camino 1 -> 3 -> 4 g7.agregarArista(n7_1, n7_3, 3.0); // 1->3 (Costo 3)
 		 * g7.agregarArista(n7_3, n7_4, 2.0); // 3->4 (Costo 2) -> Llega a 4 con costo 5
 		 * por esta vía
-		 * 
+		 *
 		 * // Desde 4 a 5 g7.agregarArista(n7_4, n7_5, 4.0); // 4->5 (Costo 4). Necesita
 		 * 4 de batería al salir de 4.
-		 * 
+		 *
 		 * Set<Integer> rp7 = new HashSet<>(); double bateriaInicial7 = 10.0; double
 		 * bateriaMaxima7 = 20.0;
-		 * 
+		 *
 		 * // Batería al llegar a 4: // Vía 1->2->4: Batería en 1 es 10. En 2 es 10-2=8.
 		 * En 4 es 8-3=5. // Vía 1->3->4: Batería en 1 es 10. En 3 es 10-3=7. En 4 es
 		 * 7-2=5. // Ambas rutas llegan a 4 con costo 5 y batería 5. No hay diferencia
 		 * en este caso.
-		 * 
+		 *
 		 * // Modifiquemos para que una ruta a 4 deje más batería (y no haya RPs que
 		 * igualen) // Para que esto funcione como queremos probar, la batería al salir
 		 * de 4 debe ser diferente // basada en el camino tomado para llegar a 4,
 		 * asumiendo que 4 no es robopuerto. // El algoritmo ya lo hace: si llega a 4
 		 * con (costo 5, bat 5) y luego otra ruta llega con (costo 5, bat 6), // la
 		 * entrada (4, 5, 6) será la que se use para explorar desde 4.
-		 * 
+		 *
 		 * // Intentemos con un robopuerto que SÍ marca la diferencia Grafo g7_mod = new
 		 * Grafo(); Nodo n7m_1 = new Nodo(1); g7_mod.agregarNodo(n7m_1); Nodo n7m_2_rp =
 		 * new Nodo(2); g7_mod.agregarNodo(n7m_2_rp); // RP Nodo n7m_3 = new Nodo(3);
 		 * g7_mod.agregarNodo(n7m_3); // No RP Nodo n7m_4 = new Nodo(4);
 		 * g7_mod.agregarNodo(n7m_4); // Destino
-		 * 
+		 *
 		 * // A 2(RP) y luego a 4: g7_mod.agregarArista(n7m_1, n7m_2_rp, 5.0); // Costo
 		 * 5 a RP g7_mod.agregarArista(n7m_2_rp, n7m_4, 5.0); // Costo 5 desde RP a
 		 * Dest. Total 10
-		 * 
+		 *
 		 * // A 3 y luego a 4: g7_mod.agregarArista(n7m_1, n7m_3, 5.0); // Costo 5 a
 		 * No-RP g7_mod.agregarArista(n7m_3, n7m_4, 5.0); // Costo 5 desde No-RP a Dest.
 		 * Total 10
-		 * 
+		 *
 		 * Set<Integer> rp7_mod = new HashSet<>(Arrays.asList(2)); // Nodo 2 es RP
 		 * double bateriaInicial7_mod = 12.0; // Suficiente para llegar a 2 o 3 double
 		 * bateriaMaxima7_mod = 20.0;
-		 * 
+		 *
 		 * // Ruta vía RP (1->2->4): // 1 (bat 12) -> 2(RP) (bat 12-5=7). En 2 recarga a
 		 * 20. // 2(RP) (bat 20) -> 4 (bat 20-5=15). Costo total 10.
-		 * 
+		 *
 		 * // Ruta vía No-RP (1->3->4): // 1 (bat 12) -> 3 (bat 12-5=7). // 3 (bat 7) ->
 		 * 4 (bat 7-5=2). Costo total 10.
-		 * 
+		 *
 		 * // Ambas rutas tienen costo 10. La que pasa por el RP deja el robot con 15 de
 		 * batería en el destino. // La que no pasa por RP deja con 2. // El algoritmo
 		 * encontrará el costo 10. El camino reconstruido podría ser cualquiera si solo
@@ -317,8 +325,8 @@ public class Resolucion {
 		 * imprimirResultadoPrueba("Mismo costo, RP permite más batería final (difícil de probar camino exacto sin más info)"
 		 * , res7_mod, 4, 10.0, null); // Camino esperado null porque podría ser uno u
 		 * otro si el costo es igual
-		 * 
-		 * 
+		 *
+		 *
 		 * // --- Caso 8: Ciclo que no debe ser tomado si es más caro --- Grafo g8 = new
 		 * Grafo(); Nodo n8_1 = new Nodo(1); g8.agregarNodo(n8_1); Nodo n8_2 = new
 		 * Nodo(2); g8.agregarNodo(n8_2); Nodo n8_3 = new Nodo(3); g8.agregarNodo(n8_3);
@@ -339,22 +347,22 @@ public class Resolucion {
 	 * ImportarArchivos(); ArrayList<Robopuerto> robopuertos =
 	 * importador.leerArchivoRobopuertos(); for(Robopuerto aux : robopuertos) {
 	 * System.out.println(aux); }
-	 * 
+	 *
 	 * // Cofres Cofre c1 = new Cofre(5, 0, "C1"); // cerca de RP1 Cofre c2 = new
 	 * Cofre(0, 7, "C2"); // cerca de RP1 Cofre c3 = new Cofre(20, 0, "C3"); //
 	 * cerca de RP2 Cofre c4 = new Cofre(15, 7, "C4"); // cerca de RP2 Cofre c5 =
 	 * new Cofre(8, 0, "C5"); // en medio, dentro de ambos (sin estar en límite)
 	 * Cofre c6 = new Cofre(50, 50, "C6"); // fuera de ambos Cofre[] cofres = { c1,
 	 * c2, c3, c4, c5, c6 };
-	 * 
+	 *
 	 * // Paso 1: Armar las redes ArrayList<Red> redes =
 	 * ArmadoRed.armado_redes(robopuertos, cofres);
-	 * 
+	 *
 	 * // Paso 2: Asignar cofres a las redes ArmadoRed.armado_cofres(redes, cofres);
-	 * 
+	 *
 	 * // Paso 3: Generar grafos para cada red //ArrayList<Grafo> grafos =
 	 * ArmadoRed.generarGrafos(redes);
-	 * 
+	 *
 	 * //pruebaDijkstraModificado(); }
 	 */
 
