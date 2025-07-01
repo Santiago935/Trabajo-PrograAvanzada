@@ -14,8 +14,14 @@ public class SimuladorRed {
 	private ArrayList<Robot> buscandoItem = new ArrayList<>();
 	private ArrayList<Robot> llevandoItem = new ArrayList<>();
 	private Set<Integer> robopuertos = new HashSet<Integer>();
-	private ArrayList<Pedido> sinAtender = new ArrayList<>();
 
+	//Para pedidos sin atender
+	private ArrayList<Pedido> sinAtender = new ArrayList<>();
+	private HashMap<Pedido, Integer> timeOutPedidosSinAtender= new HashMap<Pedido, Integer>();
+	private static final int maximoSinAtender = 10;
+	private ArrayList<Pedido> pedidosCancelados = new ArrayList<>();
+
+	
 	public SimuladorRed(Red red) {
 		this.red = red;
 		this.disponibles.addAll(red.getRobots());
@@ -39,15 +45,17 @@ public class SimuladorRed {
 			// Si no se pudo atender, se vuelve a encolar
 			if (eleccion == null || eleccion.robot == null) {
 				sinAtender.add(pedido);
-			}
-			else //Si encontré robot:
-			{								
+				//Sumo un timeOut a ese pedido
+				timeOutPedidosSinAtender.put(pedido, timeOutPedidosSinAtender.getOrDefault(pedido, 0) + 1);
+				
+			} else // Si encontré robot:
+			{
 				// Crear camino y viaje
-				eleccion.robot.asignarViaje(pedido.getcOrigen().getNodo(), (int) Math.ceil(eleccion.getDistanciaMinima()),
-						eleccion.getBateriaLlegada(), pedido, true);
-				
+				eleccion.robot.asignarViaje(pedido.getcOrigen().getNodo(),
+						(int) Math.ceil(eleccion.getDistanciaMinima()), eleccion.getBateriaLlegada(), pedido, true);
+
 				// RECORDAR QUE SI NO SE TOMO TODO EL CONTENIDO, HAY QUE CREAR OTRO PEDIDO
-				
+
 				disponibles.remove(eleccion.robot);
 				buscandoItem.add(eleccion.robot);
 			}
@@ -58,17 +66,16 @@ public class SimuladorRed {
 		for (Robot r : buscandoItem) {
 			if (r.estaEnDestino()) {
 				Pedido pedidoActual = r.getPedidoActual();
-				
+
 				// Sacarle items al cofre y guardarlo en el robot
 				Cofre cofreOrigen = pedidoActual.getcOrigen();
 				cofreOrigen.descontarItem(pedidoActual.getItem(), pedidoActual.getCantidad());
 				r.guardarItemEnMochila(pedidoActual.getCantidad());
-				
+
 				r.finalizarViaje();
 
 				Cofre cofreDestino = pedidoActual.getcDestino();
 				RobotElegido infoViaje = calcularRuta(r, cofreDestino, red.getGrafo_red());
-
 
 				// Comenzar a llevar el item, asignando ese viaje
 				r.asignarViaje(cofreDestino.getNodo(), (int) Math.ceil(infoViaje.getDistanciaMinima()),
@@ -92,17 +99,16 @@ public class SimuladorRed {
 
 		for (Robot r : llevandoItem) {
 			if (r.estaEnDestino()) {
-				
-				//Saco el item de la mochila y lo guardo en cofre de destino
+
+				// Saco el item de la mochila y lo guardo en cofre de destino
 				Pedido pedidoActual = r.getPedidoActual();
 				r.sacarItemDeMochila(pedidoActual.getCantidad());
 				Cofre cofreDestino = pedidoActual.getcDestino();
 				cofreDestino.guardarItem(pedidoActual.getItem(), pedidoActual.getCantidad());
-				
-				System.out.println("El robot " + r.getId() + " deja el item "
-						+ pedidoActual.getItem().getId() + " en el cofre " + cofreDestino.getId());
 
-				
+				System.out.println("El robot " + r.getId() + " deja el item " + pedidoActual.getItem().getId()
+						+ " en el cofre " + cofreDestino.getId());
+
 				listosParaDescargar.add(r);
 				r.finalizarViaje();
 			} else {
@@ -110,19 +116,50 @@ public class SimuladorRed {
 			}
 		}
 
-		//Disponibilizo los robots
+		// Disponibilizo los robots
 		llevandoItem.removeAll(listosParaDescargar);
 		disponibles.addAll(listosParaDescargar);
 
+		
+		//Funcion tratar no atendidos
 		// Volvemos a encolar los que no se pudieron atender
-		for (Pedido pedido : sinAtender) {
-			System.out.println("No se pudo atender al pedido: " + pedido.getcOrigen().getId() + "-"
-					+ pedido.getcDestino().getId());
-			pedidos.encolar(pedido);
-		}
+		tratarNoAtendidos();
 
 		System.out.println("---Turno finalizado---\n");
 	}
+	
+	private void tratarNoAtendidos()
+	{
+		for (Pedido pedido : sinAtender) {
+			System.out.println("No se pudo atender al pedido: " + pedido.getcOrigen().getId() + "-"
+					+ pedido.getcDestino().getId());
+			
+			if(timeOutPedidosSinAtender.getOrDefault(pedido, 0) < this.maximoSinAtender)
+			{
+				//Si todavia no estan TIMEOUT los reencolamos
+				pedidos.encolar(pedido);				
+			}
+			else
+			{
+				//Si están timeOut los cancelamos
+				pedidosCancelados.add(pedido);
+			}
+		}
+		
+		//Borramos los sin atender actuales
+		sinAtender.clear();
+	}
+	
+	public void mostrarPedidosCancelados()
+	{
+		System.out.println("Mostrando pedidos Cancelados durante la ejecución "
+				+ "(Time Out de: "+this.maximoSinAtender +")");
+		for(Pedido pedido : pedidosCancelados)
+		{
+			System.out.println(pedido);
+		}
+	}
+	
 
 	public void reencolarPedido(Pedido nuevo) {
 		pedidos.encolar(nuevo);
@@ -150,14 +187,17 @@ public class SimuladorRed {
 			Double distanciaActual = costosMinimos.get(destino.getId());
 			Double bateriaActual = bateriasMinimas.get(destino.getId());
 
-			// Si tengo nuevo minimo
-			if (Double.compare(distanciaActual, distanciaMinima) < 0) {
-				distanciaMinima = distanciaActual;
-				robotMinimo = robotActual;
-				bateriaLlegada = bateriaActual;
+			// Si nos alcanza la batería para volver a un robopuerto desde el destino
+			if (bateriaActual > cofre.getDistanciaRP_minima()) {
+				// Si tengo nuevo minimo
+				if (Double.compare(distanciaActual, distanciaMinima) < 0) {
+					distanciaMinima = distanciaActual;
+					robotMinimo = robotActual;
+					bateriaLlegada = bateriaActual;
+				}
 			}
 		}
-		
+
 		return new RobotElegido(robotMinimo, distanciaMinima, bateriaLlegada);
 	}
 
