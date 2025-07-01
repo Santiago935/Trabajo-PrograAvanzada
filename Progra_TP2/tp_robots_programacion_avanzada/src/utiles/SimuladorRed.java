@@ -14,6 +14,7 @@ public class SimuladorRed {
 	private ArrayList<Robot> buscandoItem = new ArrayList<>();
 	private ArrayList<Robot> llevandoItem = new ArrayList<>();
 	private Set<Integer> robopuertos = new HashSet<Integer>();
+	private ArrayList<Pedido> sinAtender = new ArrayList<>();
 
 	public SimuladorRed(Red red) {
 		this.red = red;
@@ -25,65 +26,102 @@ public class SimuladorRed {
 		pedidos.encolar(p);
 	}
 
+	public boolean estaTodoListo() {
+		return pedidos.estaVacia() && buscandoItem.isEmpty() && llevandoItem.isEmpty();
+	}
+
 	public void simularTurno() {
 		// Asignar pedidos
 		while (!pedidos.estaVacia() && !disponibles.isEmpty()) {
 			Pedido pedido = pedidos.desencolar();
 			RobotElegido eleccion = obtenerRobotMasCercano(disponibles, pedido.getcOrigen(), red.getGrafo_red());
 
+			// Si no se pudo atender, se vuelve a encolar
 			if (eleccion == null || eleccion.robot == null) {
-				pedidos.encolar(pedido);
-				break;
+				sinAtender.add(pedido);
 			}
-
-			// Crear camino y viaje
-			eleccion.robot.asignarViaje(pedido.getcOrigen().getNodo(), (int) Math.ceil(eleccion.getDistanciaMinima()),
-					eleccion.getBateriaLlegada(), pedido, true);
-
-			disponibles.remove(eleccion.robot);
-			buscandoItem.add(eleccion.robot);
+			else //Si encontré robot:
+			{								
+				// Crear camino y viaje
+				eleccion.robot.asignarViaje(pedido.getcOrigen().getNodo(), (int) Math.ceil(eleccion.getDistanciaMinima()),
+						eleccion.getBateriaLlegada(), pedido, true);
+				
+				// RECORDAR QUE SI NO SE TOMO TODO EL CONTENIDO, HAY QUE CREAR OTRO PEDIDO
+				
+				disponibles.remove(eleccion.robot);
+				buscandoItem.add(eleccion.robot);
+			}
 		}
 
 		// Avanzar robots que buscan item
 		List<Robot> listosParaLlevar = new ArrayList<>();
 		for (Robot r : buscandoItem) {
-			r.avanzarUnTurno(this);
-			
-			// Si llegué libero al robot
-			if (r.estaEnDestino() == true) {
+			if (r.estaEnDestino()) {
 				Pedido pedidoActual = r.getPedidoActual();
-				// cofre.interactuarConRobot(r);
 				
-				//Se finaliza el viaje
+				// Sacarle items al cofre y guardarlo en el robot
+				Cofre cofreOrigen = pedidoActual.getcOrigen();
+				cofreOrigen.descontarItem(pedidoActual.getItem(), pedidoActual.getCantidad());
+				r.guardarItemEnMochila(pedidoActual.getCantidad());
+				
 				r.finalizarViaje();
 
 				Cofre cofreDestino = pedidoActual.getcDestino();
-				
-				// CALCULAR RUTA NUEVA
 				RobotElegido infoViaje = calcularRuta(r, cofreDestino, red.getGrafo_red());
+
+
+				// Comenzar a llevar el item, asignando ese viaje
 				r.asignarViaje(cofreDestino.getNodo(), (int) Math.ceil(infoViaje.getDistanciaMinima()),
 						infoViaje.getBateriaLlegada(), pedidoActual, false);
-				
-				//Lo agrego a la lista para la siguiente etapa
-				listosParaLlevar.add(r);
+				System.out.println("El robot " + infoViaje.robot.getId() + " agarro el item "
+						+ pedidoActual.getItem().getId() + " del cofre " + cofreOrigen.getId());
+
+				listosParaLlevar.add(r); // Buffer de los que van a cambiar de estado
+			} else {
+				// Si no está en destino, avanzar un turno
+				r.avanzarUnTurno(this);
 			}
 		}
+
+		// Los paso a llevando
 		buscandoItem.removeAll(listosParaLlevar);
 		llevandoItem.addAll(listosParaLlevar);
 
 		// Avanzar robots que llevan item
 		List<Robot> listosParaDescargar = new ArrayList<>();
+
 		for (Robot r : llevandoItem) {
-			r.avanzarUnTurno(this);
 			if (r.estaEnDestino()) {
-			//	Cofre cofreDestino = r.getPedidoActual().getcAtendio();
-				//cofre.interactuarConRobot(r);
+				
+				//Saco el item de la mochila y lo guardo en cofre de destino
+				Pedido pedidoActual = r.getPedidoActual();
+				r.sacarItemDeMochila(pedidoActual.getCantidad());
+				Cofre cofreDestino = pedidoActual.getcDestino();
+				cofreDestino.guardarItem(pedidoActual.getItem(), pedidoActual.getCantidad());
+				
+				System.out.println("El robot " + r.getId() + " deja el item "
+						+ pedidoActual.getItem().getId() + " en el cofre " + cofreDestino.getId());
+
+				
 				listosParaDescargar.add(r);
 				r.finalizarViaje();
+			} else {
+				r.avanzarUnTurno(this);
 			}
 		}
+
+		//Disponibilizo los robots
 		llevandoItem.removeAll(listosParaDescargar);
 		disponibles.addAll(listosParaDescargar);
+
+		// Volvemos a encolar los que no se pudieron atender
+		for (Pedido pedido : sinAtender) {
+			System.out.println("No se pudo atender al pedido: " + pedido.getcOrigen().getId() + "-"
+					+ pedido.getcDestino().getId());
+			pedidos.encolar(pedido);
+		}
+
+		System.out.println("---Turno finalizado---\n");
 	}
 
 	public void reencolarPedido(Pedido nuevo) {
@@ -119,7 +157,7 @@ public class SimuladorRed {
 				bateriaLlegada = bateriaActual;
 			}
 		}
-
+		
 		return new RobotElegido(robotMinimo, distanciaMinima, bateriaLlegada);
 	}
 
@@ -164,16 +202,16 @@ public class SimuladorRed {
 		Double bateriaLlegada;
 
 		// Hacemos un dijkstra del robot al cofre de llegada
-		Dijkstra_resultado resul = AlgoritmosGrafos.dijkstraConBateria(grafo, robot.getNodo_actual(), robot.getBateria(), robot.getCarga_max(),
-				this.robopuertos);
+		Dijkstra_resultado resul = AlgoritmosGrafos.dijkstraConBateria(grafo, robot.getNodo_actual(),
+				robot.getBateria(), robot.getCarga_max(), this.robopuertos);
 
 		Map<Integer, Double> costosMinimos = resul.getCostosMinimos();
 		Map<Integer, Double> bateriasMinimas = resul.getMejorBateriaConCostoMinimoDouble();
 
 		distanciaMinima = costosMinimos.get(cofre.getNodo().getId());
 		bateriaLlegada = bateriasMinimas.get(cofre.getNodo().getId());
-		
-		return new RobotElegido(robot, distanciaMinima, bateriaLlegada); 
+
+		return new RobotElegido(robot, distanciaMinima, bateriaLlegada);
 	}
 
 }

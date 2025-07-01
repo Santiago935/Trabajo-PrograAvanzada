@@ -9,6 +9,10 @@ public class Coordenada {
 		this.y = y;
 	}
 
+	public double distanciaA(Coordenada otra) {
+		return distancia_eucladiana(this, otra);
+	}
+
 	public static double distancia_eucladiana(Coordenada a, Coordenada b) {
 		int lx = a.getX() - b.getX(); // Longitud X
 		int ly = a.getY() - b.getY(); // Longitud Y
@@ -29,6 +33,4 @@ public class Coordenada {
 		return "[x=" + x + ", y=" + y + "]";
 	}
 
-	
-	
 }

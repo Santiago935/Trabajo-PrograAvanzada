@@ -21,7 +21,7 @@ public abstract class Cofre implements Red.ComponenteRed {
 	public Cofre(int x, int y, String id) {
 		this.id = id;
 		this.coordenada = new Coordenada(x, y);
-		this.nodo = new Nodo(x + x * y, id); // Para tener id único
+		this.nodo = new Nodo((x+1)*1000 + (x+1) * y, id); // Para tener id único
 		this.items = new HashMap<>(); // Inicialmente cofre vacio
 	}
 

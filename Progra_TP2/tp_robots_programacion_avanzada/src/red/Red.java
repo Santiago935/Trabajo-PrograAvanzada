@@ -1,16 +1,19 @@
 package red;
 
-import grafos.*;
-import java.util.*;
-
 import cofres.Cofre;
+import grafos.Grafo;
+import grafos.Nodo;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Red {
 	private String id;
-	private Grafo grafo_red = new Grafo(false);;
-	private List<Robopuerto> robopuertos = new ArrayList<Robopuerto>();
-	private List<Cofre> cofres = new ArrayList<Cofre>();
-	private List<Robot> robots = new ArrayList<Robot>();
+	private Grafo grafo_red = new Grafo(false);
+	private List<Robopuerto> robopuertos = new ArrayList<>();
+	private List<Cofre> cofres = new ArrayList<>();
+	private List<Robot> robots = new ArrayList<>();
 
 	public Red(String id) {
 		this.id = id;
@@ -40,6 +43,10 @@ public class Red {
 		return robots;
 	}
 
+	public String getId() {
+		return id;
+	}
+
 	public void add_robot(Robot robot) {
 		this.robots.add(robot);
 	}
@@ -50,6 +57,13 @@ public class Red {
 
 	public void add_cofre(Cofre cofre) {
 		this.cofres.add(cofre);
+	}
+
+	public List<ComponenteRed> getComponentes() {
+		List<ComponenteRed> componentes = new ArrayList<>();
+		componentes.addAll(robopuertos);
+		componentes.addAll(cofres);
+		return componentes;
 	}
 
 	@Override
@@ -89,6 +103,12 @@ public class Red {
 
 		Coordenada getCoordenada();
 	}
+
+	public void setGrafo_red(Grafo grafo_red) {
+		this.grafo_red = grafo_red;
+	}
+	
+	
 
 //fin
 }

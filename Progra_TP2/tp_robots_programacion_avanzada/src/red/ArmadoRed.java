@@ -39,6 +39,8 @@ public class ArmadoRed {
 
 		armado_robots(lista_redes, robots);
 
+		generarGrafos(lista_redes);
+		
 		return lista_redes;
 	}
 
@@ -91,8 +93,7 @@ public class ArmadoRed {
 
 	}
 
-	public static ArrayList<Grafo> generarGrafos(ArrayList<Red> redes) {
-		ArrayList<Grafo> listaGrafos = new ArrayList<>();
+	public static void generarGrafos(ArrayList<Red> redes) {
 
 		for (Red red : redes) {
 			Grafo grafoDeLaRed = red.getGrafo_red();
@@ -122,10 +123,6 @@ public class ArmadoRed {
 					grafoDeLaRed.addArista(compA.getNodo(), compB.getNodo(), distancia);
 				}
 			}
-
-			listaGrafos.add(grafoDeLaRed);
 		}
-
-		return listaGrafos;
 	}
 }

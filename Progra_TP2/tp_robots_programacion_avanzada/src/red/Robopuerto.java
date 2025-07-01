@@ -12,7 +12,7 @@ public class Robopuerto implements Red.ComponenteRed{
 	public Robopuerto(String id, int x, int y, double radio) {
 		this.id = id;
 		this.coordenada = new Coordenada(x, y);
-		this.nodo = new Nodo(x + x * y, id);// Para tener id único
+		this.nodo = new Nodo((x+1)*1000 + (x+1) * y, id);// Para tener id único
 		this.radio = radio;
 	}
 

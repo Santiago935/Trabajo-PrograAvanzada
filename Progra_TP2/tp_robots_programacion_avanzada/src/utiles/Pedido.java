@@ -17,7 +17,7 @@ public class Pedido implements Comparable<Pedido> {
 		this.cDestino = cAtendio;
 		this.item = item;
 		this.cantidad = cantidad;
-		// Agregar distancia
+		this.distancia = Coordenada.distancia_eucladiana(cSolicito.getCoordenada(), cAtendio.getCoordenada());
 	}
 
 	public void AtenderPedido(Cofre cofreQueAtendera) {
@@ -80,72 +80,102 @@ public class Pedido implements Comparable<Pedido> {
 	}
 
 	/* ---------- ARMADO DE PEDIDOS ---------- */
-	public static ArrayList<Pedido> armado_pedidos3(ArrayList<Red> redes) {
+	public static ArrayList<Pedido> armado_pedidos3(Red red) {
 		ArrayList<Pedido> pedidos = new ArrayList<>();
 
-		for (Red red : redes) {
-			ArrayList<Cofre> cofres = (ArrayList<Cofre>) red.getCofres();
+		ArrayList<Cofre> cofres = (ArrayList<Cofre>) red.getCofres();
 
-			List<PuedeSolicitar> solicitantes = new ArrayList<>();
-			List<PuedeOfertar> ofertantes = new ArrayList<>();
+		List<PuedeSolicitar> solicitantes = new ArrayList<>();
+		List<PuedeOfertar> ofertantes = new ArrayList<>();
 
-			for (Cofre c : cofres) {
-				if (c instanceof PuedeSolicitar) {
-					solicitantes.add((PuedeSolicitar) c);
-				}
-				if (c instanceof PuedeOfertar) {
-					ofertantes.add((PuedeOfertar) c);
-				}
+		for (Cofre c : cofres) {
+			if (c instanceof PuedeSolicitar) {
+				solicitantes.add((PuedeSolicitar) c);
 			}
+			if (c instanceof PuedeOfertar) {
+				ofertantes.add((PuedeOfertar) c);
+			}
+		}
 
-			// ordenamos ofertantes por prioridad: activa -> bufer -> pasiva
-			ofertantes.sort((a, b) -> {
-				if (a instanceof CofreProvisionActiva && !(b instanceof CofreProvisionActiva))
-					return -1;
-				if (b instanceof CofreProvisionActiva && !(a instanceof CofreProvisionActiva))
-					return 1;
-				if (a instanceof CofreBufer && !(b instanceof CofreBufer))
-					return -1;
-				if (b instanceof CofreBufer && !(a instanceof CofreBufer))
-					return 1;
-				return 0;
-			});
+		// ordenamos ofertantes por prioridad
+		ofertantes.sort((a, b) -> {
+			if (a instanceof CofreProvisionActiva && !(b instanceof CofreProvisionActiva))
+				return -1;
+			if (b instanceof CofreProvisionActiva && !(a instanceof CofreProvisionActiva))
+				return 1;
+			if (a instanceof CofreBufer && !(b instanceof CofreBufer))
+				return -1;
+			if (b instanceof CofreBufer && !(a instanceof CofreBufer))
+				return 1;
+			return 0;
+		});
 
-			for (PuedeSolicitar solicitante : solicitantes) {
-				Set<Item> itemsSolicitados = obtenerItemsSolicitados(solicitante);
+		for (PuedeSolicitar solicitante : solicitantes) {
+			Set<Item> itemsSolicitados = obtenerItemsSolicitados(solicitante);
 
-				for (Item item : itemsSolicitados) {
-					int cantidadNecesaria = solicitante.cuantoSolicita(item);
-					if (cantidadNecesaria <= 0)
-						continue;
+			for (Item item : itemsSolicitados) {
+				int cantidadNecesaria = solicitante.cuantoSolicita(item);
+				if (cantidadNecesaria <= 0)
+					continue;
 
-					for (PuedeOfertar ofertante : ofertantes) {
-						int stockDisponible = ofertante.cuantoOfrece(item);
-						if (stockDisponible <= 0)
-							continue;
+				boolean seAtendio = false;
 
-						int cantidadAtendida = Math.min(cantidadNecesaria, stockDisponible);
-
-						if (ofertante.reservarItem(item, cantidadAtendida)) {
-							solicitante.aceptarPedido(item, cantidadAtendida);
-
+				for (PuedeOfertar ofertante : ofertantes) {
+					int stockDisponible = ofertante.cuantoOfrece(item);
+					if (stockDisponible >= cantidadNecesaria) {
+						if (ofertante.reservarItem(item, cantidadNecesaria)) {
+							solicitante.aceptarPedido(item, cantidadNecesaria);
 							Cofre origen = (Cofre) solicitante;
 							Cofre destino = (Cofre) ofertante;
 
-							Pedido nuevoPedido = new Pedido(origen, destino, item, cantidadAtendida);
+							Pedido nuevoPedido = new Pedido(origen, destino, item, cantidadNecesaria);
 							pedidos.add(nuevoPedido);
-
-							cantidadNecesaria -= cantidadAtendida;
-							if (cantidadNecesaria <= 0)
-								break;
+							seAtendio = true;
+							break;
 						}
 					}
+				}
+
+				if (!seAtendio) {
+					System.out.println("No se puede atender el pedido de " + cantidadNecesaria + " unidades de item "
+							+ item.getNombre() + " desde el cofre " + ((Cofre) solicitante).getId()
+							+ ": no hay stock suficiente.");
 				}
 			}
 		}
 
-		return pedidos;
+		return separarPedidosEnTamanioMaximo(pedidos);
 	}
+	
+	private static ArrayList<Pedido> separarPedidosEnTamanioMaximo(ArrayList<Pedido> pedidos)
+	{
+		ArrayList<Pedido> pedidosSeparados = new ArrayList<Pedido>();
+		
+		for(Pedido pedido : pedidos)
+		{
+			int cantidadDePedidos=0, resto=0;
+
+			cantidadDePedidos = pedido.cantidad/Robot.cargaMaximaDeMochila;
+			resto = pedido.cantidad % Robot.cargaMaximaDeMochila;
+			
+			for(int i = 0; i< cantidadDePedidos; i++)
+			{
+				Pedido pedidoNuevo = new Pedido(pedido.getcOrigen(), pedido.getcDestino(), pedido.getItem(), Robot.cargaMaximaDeMochila);
+				pedidosSeparados.add(pedidoNuevo);
+			}
+			
+			if(resto>0)
+			{
+				Pedido pedidoNuevo = new Pedido(pedido.getcOrigen(), pedido.getcDestino(), pedido.getItem(), resto);
+				pedidosSeparados.add(pedidoNuevo);
+			}
+			
+		}
+		
+		return pedidosSeparados;
+	} 
+	
+	
 
 	private static Set<Item> obtenerItemsSolicitados(PuedeSolicitar solicitante) {
 		Set<Item> items = new HashSet<>();

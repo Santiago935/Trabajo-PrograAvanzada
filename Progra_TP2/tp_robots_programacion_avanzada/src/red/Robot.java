@@ -5,7 +5,8 @@ import grafos.*;
 
 public class Robot {
 	private String id;
-	private final double carga_max = 20.0;
+	private final double carga_max = 20.0; // Es bateria
+	public static final int cargaMaximaDeMochila = 40;
 	private int carga_actual;
 	private Nodo nodo_actual;
 	private double bateria;
@@ -63,12 +64,8 @@ public class Robot {
 
 	@Override
 	public String toString() {
-	    return String.format(
-	        "Robot[id=%s, carga_actual=%d, robo_puerto_inicial=%s]",
-	        id,
-	        carga_actual,
-	        idRPInicial != null ? idRPInicial : "(no asignado)"
-	    );
+		return String.format("Robot[id=%s, carga_actual=%d, robo_puerto_inicial=%s]", id, carga_actual,
+				idRPInicial != null ? idRPInicial : "(no asignado)");
 	}
 
 	// METODOS DE VIAJE ---------------------------------------------------
@@ -87,13 +84,18 @@ public class Robot {
 
 	public void avanzarUnTurno(SimuladorRed sim) {
 		if (viaje != null) {
+			// AGREGO LOG
+			System.out.printf("Robot %s avanzando - pasos restantes: %d\n", id, viaje.getPasosRestantes());
 			viaje.avanzar();
 		}
 	}
 
 	public boolean estaEnDestino() {
-		if (viaje != null && viaje.getPasosRestantes() == 0)
+		if (viaje != null && viaje.getPasosRestantes() == 0) {
+			// AGREGO LOG
+			System.out.printf("Robot %s - llego? pasos restantes = %d\n", id, viaje.getPasosRestantes());
 			return true;
+		}
 		return false;
 	}
 
@@ -107,5 +109,33 @@ public class Robot {
 			this.viaje = null;
 		}
 	}
+
+	public void guardarItemEnMochila(int cantidad) {
+		if ( (this.cargaMaximaDeMochila - this.carga_actual) < cantidad) {
+			System.out.println("Soy robot: " + this.id);
+			System.out.println("No podes cargar esa cantidad:" + cantidad);
+		} else {
+			this.carga_actual += cantidad;
+		}
+	}
+
+	public void sacarItemDeMochila(int cantidad) {
+		if(this.carga_actual - cantidad < 0)
+		{
+			System.out.println("Soy robot: " + this.id);
+			System.out.println("La carga actual no puede ser negativa.");
+		}
+		else
+			this.carga_actual -= cantidad; 
+	}
+
+	public int getCargaMaximaDeMochila() {
+		return cargaMaximaDeMochila;
+	}
+
+	
+
+	
+	
 
 }

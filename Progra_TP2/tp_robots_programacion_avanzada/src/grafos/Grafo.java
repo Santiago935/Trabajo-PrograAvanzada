@@ -32,19 +32,21 @@ public class Grafo {
 	public List<Arista> getAristas_deNodo(Nodo nodo) {
 		return this.listaAdy.getOrDefault(nodo, new ArrayList<Arista>());
 	}
-	
-	public Set<Nodo> getVecinos(Nodo nodo)
-	{
+
+	public boolean contieneNodo(Nodo nodo) {
+		return this.listaAdy.containsKey(nodo);
+	}
+
+	public Set<Nodo> getVecinos(Nodo nodo) {
 		List<Arista> aristas = getAristas_deNodo(nodo);
-		
+
 		Set<Nodo> vecinos = new HashSet<Nodo>();
-		for(Arista arista : aristas)
-		{
+		for (Arista arista : aristas) {
 			Nodo destino = arista.getObjetivo();
 			vecinos.add(destino);
 		}
-		
-		return vecinos; //Si no tiene vecinos devuelvo un Set vacío, no un null
+
+		return vecinos; // Si no tiene vecinos devuelvo un Set vacío, no un null
 	}
 
 	// Devuelvo un SET de nodos por la naturaleza no repetible de los mismos en el
@@ -52,17 +54,40 @@ public class Grafo {
 	public Set<Nodo> getNodos() {
 		return this.listaAdy.keySet();
 	}
-	
-	public void imprimirGrafo()
-	{
-		for(Nodo nodo : this.listaAdy.keySet())
-		{
-			System.out.print(nodo + " -> ");
-			for(Arista arista : this.listaAdy.get(nodo)) {
-				System.out.print(arista.getObjetivo() + "(Peso: " + arista.getPeso()+ ") ");
+
+	public void imprimirGrafo() {
+		System.out.println("=== Grafo de la Red ===");
+		Set<String> aristasImpresas = new HashSet<>();
+
+		for (Nodo nodo : this.listaAdy.keySet()) {
+			System.out.println("Desde " + nodo + ":");
+
+			for (Arista arista : this.listaAdy.get(nodo)) {
+				Nodo destino = arista.getObjetivo();
+				double peso = arista.getPeso();
+
+				// Para evitar duplicados en grafo no dirigido
+				String clave = nodo.getId() < destino.getId() ? nodo.getId() + "-" + destino.getId()
+						: destino.getId() + "-" + nodo.getId();
+
+				if (!esDirigido && aristasImpresas.contains(clave))
+					continue;
+				aristasImpresas.add(clave);
+
+				System.out.printf("  --> %-20s (Costo: %.2f)\n", destino.toString(), peso);
 			}
-			System.out.println();
 		}
+		System.out.println("========================");
 	}
+
+//	public void imprimirGrafo() {
+//		for (Nodo nodo : this.listaAdy.keySet()) {
+//			System.out.print(nodo + " -> ");
+//			for (Arista arista : this.listaAdy.get(nodo)) {
+//				System.out.print(arista.getObjetivo() + "(Peso: " + arista.getPeso() + ") ");
+//			}
+//			System.out.println();
+//		}
+//	}
 
 }

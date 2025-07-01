@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="ImportExportAction">
-		<item key="ImportExportPage.STORE_SELECTED_IMPORT_WIZARD_ID" value="org.eclipse.ui.wizards.import.FileSystem"/>
+		<item key="ImportExportPage.STORE_SELECTED_IMPORT_WIZARD_ID" value="org.eclipse.ui.wizards.import.ExternalProject"/>
 		<list key="ImportExportPage.STORE_EXPANDED_IMPORT_CATEGORIES">
 			<item value="org.eclipse.ui.Basic"/>
 		</list>
@@ -32,11 +32,11 @@
 			<item value="C:\Users\Gonza\Desktop\workspace_cursada\proy_Diagnostico\src\grafos"/>
 		</list>
 		<section name="FileSystemImportWizard.dialogBounds">
-			<item key="DIALOG_X_ORIGIN" value="618"/>
-			<item key="DIALOG_Y_ORIGIN" value="169"/>
-			<item key="DIALOG_WIDTH" value="803"/>
-			<item key="DIALOG_HEIGHT" value="671"/>
-			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|10.5|0|WINDOWS|1|-14|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+			<item key="DIALOG_X_ORIGIN" value="575"/>
+			<item key="DIALOG_Y_ORIGIN" value="183"/>
+			<item key="DIALOG_WIDTH" value="895"/>
+			<item key="DIALOG_HEIGHT" value="747"/>
+			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|10.200001|0|WINDOWS|1|-17|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 		</section>
 	</section>
 </section>
