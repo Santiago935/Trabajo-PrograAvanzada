@@ -1,6 +1,7 @@
 package resolucion;
 
 import cofres.Cofre;
+import cofres.PuedeOfertar;
 import cola_de_prioridad.TDA.Cola_prioridad_heap;
 import grafos.AlgoritmosGrafos;
 import grafos.Grafo;
@@ -54,7 +55,7 @@ public class Resolucion {
 	}
 
 	/////////////// SIMULACION DE LA RED ///////////////
-	public static void simulacionCompletaDeRed(Red red) {
+	public static void simulacionCompletaDeRed(Red red, ArrayList<Item> listaItems) {
 		SimuladorRed simulador = new SimuladorRed(red);
 
 		// 1) Armar pedidos
@@ -84,7 +85,7 @@ public class Resolucion {
 
 			// Dormir el hilo por 1 segundo (1000 ms)
 			try {
-				Thread.sleep(2000); // puedes ajustar el valor
+				Thread.sleep(1000); // puedes ajustar el valor
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				System.out.println("Simulación interrumpida.");
@@ -96,8 +97,26 @@ public class Resolucion {
 
 		//4) Mostramos los pedidos cancelados
 		simulador.mostrarPedidosCancelados();
+		
+		//5) Mostramos cofres PA que no tienen destino
+		
+		for (Cofre cofre : red.getCofres()) {
+            if (cofre instanceof PuedeOfertar) {
+                PuedeOfertar ofertante = (PuedeOfertar) cofre;
 
-		System.out.println("Simulacion finalizada en " + turno + " turnos.");
+                for (Item item : listaItems) {
+                    int ofrecido = ofertante.cuantoOfrece(item);
+                    int enStock = cofre.consultarItem(item);
+
+                    if (ofrecido > 0 && enStock >= ofrecido) {
+                        System.out.printf("- El cofre %s sigue ofreciendo %d unidades de %s (stock: %d)%n",
+                                cofre.getId(), ofrecido, item.getNombre(), enStock);
+                    }
+                }
+            }
+        }
+
+		System.out.println("\nSimulacion finalizada en " + turno + " turnos.");
 	}
 
 	//----- EJEMPLO PARA LA CLASE ------
@@ -138,7 +157,9 @@ public class Resolucion {
 
 		for(Red red : redes)
 		{
-			simulacionCompletaDeRed(red);
+			simulacionCompletaDeRed(red, listaItems);
+			System.out.println(red);
+			
 		}		
 	}
 	

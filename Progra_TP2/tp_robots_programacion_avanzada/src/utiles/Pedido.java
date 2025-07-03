@@ -125,8 +125,8 @@ public class Pedido implements Comparable<Pedido> {
 					if (stockDisponible >= cantidadNecesaria) {
 						if (ofertante.reservarItem(item, cantidadNecesaria)) {
 							solicitante.aceptarPedido(item, cantidadNecesaria);
-							Cofre origen = (Cofre) solicitante;
-							Cofre destino = (Cofre) ofertante;
+							Cofre origen = (Cofre) ofertante;
+							Cofre destino = (Cofre) solicitante;
 
 							Pedido nuevoPedido = new Pedido(origen, destino, item, cantidadNecesaria);
 							pedidos.add(nuevoPedido);
@@ -143,7 +143,9 @@ public class Pedido implements Comparable<Pedido> {
 				}
 			}
 		}
-
+		
+		
+		 
 		return separarPedidosEnTamanioMaximo(pedidos);
 	}
 	

@@ -146,17 +146,6 @@ public class AlgoritmosGrafos {
             predecesores.put(nodo.getId(), null);
             mejorBateriaConCostoMinimoInt.put(nodo.getId(), -1); // Un valor que indique "sin batería válida"
         }
-
-        /*
-        if (inicio == null) {
-            System.err.println("Error: El nodo de inicio no puede ser null.");
-            // Devolver un resultado vacío pero inicializado para evitar NullPointerExceptions posteriores
-            Map<Integer, Double> costosVacios = new HashMap<>();
-            for (Nodo nodo : grafo.getNodos()) {
-                 costosVacios.put(nodo.getId(), Double.MAX_VALUE);
-            }
-            return new Dijkstra_resultado(new HashMap<>(), new HashMap<>()); // O como manejes resultados vacíos
-        }*/
         
         costosMinimosInt.put(inicio.getId(), 0); // Costo inicial es 0 (0 * 100 = 0)
         mejorBateriaConCostoMinimoInt.put(inicio.getId(), bateriaInicialInt);

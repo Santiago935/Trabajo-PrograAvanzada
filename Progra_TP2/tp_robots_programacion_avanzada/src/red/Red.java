@@ -48,16 +48,35 @@ public class Red {
 	}
 
 	public void add_robot(Robot robot) {
-		this.robots.add(robot);
-	}
 
-	public void add_robopuerto(Robopuerto robopuerto) {
-		this.robopuertos.add(robopuerto);
-	}
+        if (robot == null) {
+            throw new IllegalArgumentException("El robot no puede ser nulo");
+        }
+        if(this.robots.contains(robot)) {
+            throw new IllegalArgumentException("El robot ya está en la red");
+        }
+        this.robots.add(robot);
+    }
 
-	public void add_cofre(Cofre cofre) {
-		this.cofres.add(cofre);
-	}
+    public void add_robopuerto(Robopuerto robopuerto) {
+        if (robopuerto == null) {
+            throw new IllegalArgumentException("El robopuerto no puede ser nulo");
+        }
+        if(this.robopuertos.contains(robopuerto)) {
+            throw new IllegalArgumentException("El robopuerto ya está en la red");
+        }
+        this.robopuertos.add(robopuerto);
+    }
+
+    public void add_cofre(Cofre cofre) {
+        if (cofre == null) {
+            throw new IllegalArgumentException("El cofre no puede ser nulo");
+        }
+        if(this.cofres.contains(cofre)) {
+            throw new IllegalArgumentException("El cofre ya está en la red");
+        }
+        this.cofres.add(cofre);
+    }
 
 	public List<ComponenteRed> getComponentes() {
 		List<ComponenteRed> componentes = new ArrayList<>();
@@ -108,7 +127,4 @@ public class Red {
 		this.grafo_red = grafo_red;
 	}
 	
-	
-
-//fin
 }

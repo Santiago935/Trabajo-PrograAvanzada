@@ -1,6 +1,7 @@
 package cofres;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import grafos.*;
 import red.Coordenada;
@@ -60,8 +61,18 @@ public abstract class Cofre implements Red.ComponenteRed {
 
 	@Override
 	public String toString() {
-		return String.format("Cofre[id=%s, coord=(x=%d, y=%d), nodo=%s, tipo=%s]", id, coordenada.getX(),
+		String resultado = String.format("Cofre[id=%s, coord=(x=%d, y=%d), nodo=%s, tipo=%s]", id, coordenada.getX(),
 				coordenada.getY(), nodo.getAlias(), this.getClass().getSimpleName());
+		if (items.isEmpty()) {
+	        resultado += "\n      (Sin ítems)";
+	    } else {
+	        resultado += "\n     Ítems:";
+	        for (Entry<Item, Integer> entry : items.entrySet()) {
+	            resultado += String.format("\n      - %d: %s", entry.getValue(), entry.getKey().getNombre());
+	        }
+	    }
+		
+		return resultado;
 	}
 
 	@Override

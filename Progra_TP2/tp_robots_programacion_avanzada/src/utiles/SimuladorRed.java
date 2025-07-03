@@ -53,6 +53,7 @@ public class SimuladorRed {
 				// Crear camino y viaje
 				eleccion.robot.asignarViaje(pedido.getcOrigen().getNodo(),
 						(int) Math.ceil(eleccion.getDistanciaMinima()), eleccion.getBateriaLlegada(), pedido, true);
+				System.out.printf("\n- El robot %s está en %s  toma el pedido %s - %d \n\n",eleccion.robot.getId(),eleccion.robot.getNodo_actual().getAlias(),pedido.toString(),(int) Math.ceil(eleccion.getDistanciaMinima()));
 
 				// RECORDAR QUE SI NO SE TOMO TODO EL CONTENIDO, HAY QUE CREAR OTRO PEDIDO
 
@@ -60,6 +61,7 @@ public class SimuladorRed {
 				buscandoItem.add(eleccion.robot);
 			}
 		}
+		
 
 		// Avanzar robots que buscan item
 		List<Robot> listosParaLlevar = new ArrayList<>();
@@ -80,8 +82,7 @@ public class SimuladorRed {
 				// Comenzar a llevar el item, asignando ese viaje
 				r.asignarViaje(cofreDestino.getNodo(), (int) Math.ceil(infoViaje.getDistanciaMinima()),
 						infoViaje.getBateriaLlegada(), pedidoActual, false);
-				System.out.println("El robot " + infoViaje.robot.getId() + " agarro el item "
-						+ pedidoActual.getItem().getId() + " del cofre " + cofreOrigen.getId());
+				System.out.println("El robot " + infoViaje.robot.getId() + "  toma "+  pedidoActual.getCantidad() + " " + pedidoActual.getItem().getNombre() + " del cofre " + cofreOrigen.getId());
 
 				listosParaLlevar.add(r); // Buffer de los que van a cambiar de estado
 			} else {
@@ -106,7 +107,7 @@ public class SimuladorRed {
 				Cofre cofreDestino = pedidoActual.getcDestino();
 				cofreDestino.guardarItem(pedidoActual.getItem(), pedidoActual.getCantidad());
 
-				System.out.println("El robot " + r.getId() + " deja el item " + pedidoActual.getItem().getId()
+				System.out.println("El robot " + r.getId() +  " deja " + pedidoActual.getCantidad() + " " + pedidoActual.getItem().getNombre()
 						+ " en el cofre " + cofreDestino.getId());
 
 				listosParaDescargar.add(r);
@@ -152,6 +153,9 @@ public class SimuladorRed {
 	
 	public void mostrarPedidosCancelados()
 	{
+		if(pedidosCancelados.isEmpty()) {
+			return;
+		}
 		System.out.println("Mostrando pedidos Cancelados durante la ejecución "
 				+ "(Time Out de: "+this.maximoSinAtender +")");
 		for(Pedido pedido : pedidosCancelados)
@@ -159,6 +163,7 @@ public class SimuladorRed {
 			System.out.println(pedido);
 		}
 	}
+	
 	
 
 	public void reencolarPedido(Pedido nuevo) {
